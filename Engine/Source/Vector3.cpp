@@ -61,12 +61,19 @@ bool Vector3::Normalize(double* length /*= nullptr*/)
 	return true;
 }
 
-void Vector3::Decompose(const Vector3& vector, Vector3& projection, Vector3& rejection) const
+void Vector3::Decompose(Vector3& projection, Vector3& rejection) const
 {
 }
 
-void Vector3::Rotate(const Vector3& vector, const Vector3& axis, double angle)
+void Vector3::Rotate(const Vector3& axis, double angle)
 {
+}
+
+void Vector3::operator=(const Vector3& vector)
+{
+	this->x = vector.x;
+	this->y = vector.y;
+	this->z = vector.z;
 }
 
 void Vector3::operator+=(const Vector3& vector)
