@@ -6,6 +6,7 @@ namespace PhysicsEngine
 {
 	class Vector3;
 	class Plane;
+	class AxisAlignedBoundingBox;
 
 	class PHYSICS_ENGINE_API PolygonMesh
 	{
@@ -35,7 +36,9 @@ namespace PhysicsEngine
 
 		void Clear();
 		bool GenerateConvexHull(const std::vector<Vector3>& pointArray);
-		bool ContainsPoint(const Vector3& point) const;
+		bool ContainsPoint(const Vector3& point) const;		// This assumes the mesh forms a convex hull.
+		bool CalcBoundingBox(AxisAlignedBoundingBox& aabb) const;
+		void Translate(const Vector3& translationDelta);
 
 	private:
 

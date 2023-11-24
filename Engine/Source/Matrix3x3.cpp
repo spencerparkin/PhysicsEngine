@@ -31,6 +31,13 @@ double Matrix3x3::Determinant() const
 		+ this->ele[0][2] * (this->ele[1][0] * this->ele[2][1] - this->ele[2][0] * this->ele[1][1]);
 }
 
+void Matrix3x3::SetZero()
+{
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			this->ele[i][j] = 0.0;
+}
+
 void Matrix3x3::SetIdentity()
 {
 	for (int i = 0; i < 3; i++)

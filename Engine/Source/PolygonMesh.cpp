@@ -1,6 +1,7 @@
 #include "PolygonMesh.h"
 #include "Vector3.h"
 #include "Plane.h"
+#include "AxisAlignedBoundingBox.h"
 
 using namespace PhysicsEngine;
 
@@ -197,7 +198,7 @@ bool PolygonMesh::GenerateConvexHull(const std::vector<Vector3>& pointArray)
 		{
 			if (polygon->HasVertex(i))
 			{
-				vertexMap.insert(std::pair<int, int>(i, this->vertexArray->size()));
+				vertexMap.insert(std::pair<int, int>(i, (int)this->vertexArray->size()));
 				this->vertexArray->push_back(pointArray[i]);
 				break;
 			}
@@ -214,7 +215,33 @@ bool PolygonMesh::GenerateConvexHull(const std::vector<Vector3>& pointArray)
 
 bool PolygonMesh::ContainsPoint(const Vector3& point) const
 {
-	return false;
+	for (Polygon* polygon : *this->polygonArray)
+	{
+		Plane plane;
+		polygon->MakePlane(plane, *this->vertexArray);
+		if (plane.WhichSide(point) == Plane::Side::FRONT)
+			return false;
+	}
+
+	return true;
+}
+
+bool PolygonMesh::CalcBoundingBox(AxisAlignedBoundingBox& aabb) const
+{
+	if (this->vertexArray->size() == 0)
+		return false;
+
+	aabb = AxisAlignedBoundingBox((*this->vertexArray)[0]);
+	for (int i = 1; i < (signed)this->vertexArray->size(); i++)
+		aabb.ExpandToIncludePoint((*this->vertexArray)[i]);
+
+	return true;
+}
+
+void PolygonMesh::Translate(const Vector3& translationDelta)
+{
+	for (Vector3& vertex : *this->vertexArray)
+		vertex += translationDelta;
 }
 
 //------------------------------------ PolygonMesh::Polygon ------------------------------------

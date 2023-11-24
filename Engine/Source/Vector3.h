@@ -23,6 +23,7 @@ namespace PhysicsEngine
 		void operator+=(const Vector3& vector);
 		void operator-=(const Vector3& vector);
 		void operator*=(double scalar);
+		Vector3 operator-() const;
 
 		double x, y, z;
 	};
@@ -31,4 +32,5 @@ namespace PhysicsEngine
 	PHYSICS_ENGINE_API Vector3 operator-(const Vector3& vectorA, const Vector3& vectorB);
 	PHYSICS_ENGINE_API Vector3 operator*(const Vector3& vector, double scalar);
 	PHYSICS_ENGINE_API Vector3 operator*(double scalar, const Vector3& vector);
+	PHYSICS_ENGINE_API Vector3 operator/(const Vector3& vector, double scalar);
 }

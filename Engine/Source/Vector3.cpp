@@ -99,6 +99,14 @@ void Vector3::operator*=(double scalar)
 	this->z *= scalar;
 }
 
+Vector3 Vector3::operator-() const
+{
+	return Vector3(
+		-this->x,
+		-this->y,
+		-this->z);
+}
+
 namespace PhysicsEngine
 {
 	Vector3 operator+(const Vector3& vectorA, const Vector3& vectorB)
@@ -134,6 +142,15 @@ namespace PhysicsEngine
 		result.x = vector.x * scalar;
 		result.y = vector.y * scalar;
 		result.z = vector.z * scalar;
+		return result;
+	}
+
+	Vector3 operator/(const Vector3& vector, double scalar)
+	{
+		Vector3 result;
+		result.x = vector.x / scalar;
+		result.y = vector.y / scalar;
+		result.z = vector.z / scalar;
 		return result;
 	}
 }

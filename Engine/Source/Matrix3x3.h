@@ -16,6 +16,7 @@ namespace PhysicsEngine
 		virtual ~Matrix3x3();
 
 		double Determinant() const;
+		void SetZero();
 		void SetIdentity();
 		void SetAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
 		void GetAxes(Vector3& xAxis, Vector3& yAxis, Vector3& zAxis) const;
