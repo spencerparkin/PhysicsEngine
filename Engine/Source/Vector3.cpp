@@ -1,50 +1,50 @@
-#include "Vector.h"
+#include "Vector3.h"
 
 using namespace PhysicsEngine;
 
-Vector::Vector()
+Vector3::Vector3()
 {
 	this->x = 0.0;
 	this->y = 0.0;
 	this->z = 0.0;
 }
 
-Vector::Vector(const Vector& vector)
+Vector3::Vector3(const Vector3& vector)
 {
 	this->x = vector.x;
 	this->y = vector.y;
 	this->z = vector.z;
 }
 
-Vector::Vector(double x, double y, double z)
+Vector3::Vector3(double x, double y, double z)
 {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 }
 
-/*virtual*/ Vector::~Vector()
+/*virtual*/ Vector3::~Vector3()
 {
 }
 
-double Vector::Length() const
+double Vector3::Length() const
 {
 	return ::sqrt(this->Dot(*this));
 }
 
-double Vector::Dot(const Vector& vector) const
+double Vector3::Dot(const Vector3& vector) const
 {
 	return this->x * vector.x + this->y * vector.y + this->z * vector.z;
 }
 
-void Vector::Cross(const Vector& vectorA, const Vector& vectorB)
+void Vector3::Cross(const Vector3& vectorA, const Vector3& vectorB)
 {
 	this->x = vectorA.y * vectorB.z - vectorA.z * vectorB.y;
 	this->y = vectorA.z * vectorB.x - vectorA.x * vectorB.z;
 	this->z = vectorA.x * vectorB.y - vectorA.y * vectorB.x;
 }
 
-bool Vector::Normalize(double* length /*= nullptr*/)
+bool Vector3::Normalize(double* length /*= nullptr*/)
 {
 	double magnitude = this->Length();
 	if (length)
@@ -61,29 +61,29 @@ bool Vector::Normalize(double* length /*= nullptr*/)
 	return true;
 }
 
-void Vector::Decompose(const Vector& vector, Vector& projection, Vector& rejection) const
+void Vector3::Decompose(const Vector3& vector, Vector3& projection, Vector3& rejection) const
 {
 }
 
-void Vector::Rotate(const Vector& vector, const Vector& axis, double angle)
+void Vector3::Rotate(const Vector3& vector, const Vector3& axis, double angle)
 {
 }
 
-void Vector::operator+=(const Vector& vector)
+void Vector3::operator+=(const Vector3& vector)
 {
 	this->x += vector.x;
 	this->y += vector.y;
 	this->z += vector.z;
 }
 
-void Vector::operator-=(const Vector& vector)
+void Vector3::operator-=(const Vector3& vector)
 {
 	this->x -= vector.x;
 	this->y -= vector.y;
 	this->z -= vector.z;
 }
 
-void Vector::operator*=(double scalar)
+void Vector3::operator*=(double scalar)
 {
 	this->x *= scalar;
 	this->y *= scalar;
@@ -92,36 +92,36 @@ void Vector::operator*=(double scalar)
 
 namespace PhysicsEngine
 {
-	Vector operator+(const Vector& vectorA, const Vector& vectorB)
+	Vector3 operator+(const Vector3& vectorA, const Vector3& vectorB)
 	{
-		Vector result;
+		Vector3 result;
 		result.x = vectorA.x + vectorB.x;
 		result.y = vectorA.y + vectorB.y;
 		result.z = vectorA.z + vectorB.z;
 		return result;
 	}
 
-	Vector operator-(const Vector& vectorA, const Vector& vectorB)
+	Vector3 operator-(const Vector3& vectorA, const Vector3& vectorB)
 	{
-		Vector result;
+		Vector3 result;
 		result.x = vectorA.x - vectorB.x;
 		result.y = vectorA.y - vectorB.y;
 		result.z = vectorA.z - vectorB.z;
 		return result;
 	}
 
-	Vector operator*(const Vector& vector, double scalar)
+	Vector3 operator*(const Vector3& vector, double scalar)
 	{
-		Vector result;
+		Vector3 result;
 		result.x = vector.x * scalar;
 		result.y = vector.y * scalar;
 		result.z = vector.z * scalar;
 		return result;
 	}
 
-	Vector operator*(double scalar, const Vector& vector)
+	Vector3 operator*(double scalar, const Vector3& vector)
 	{
-		Vector result;
+		Vector3 result;
 		result.x = vector.x * scalar;
 		result.y = vector.y * scalar;
 		result.z = vector.z * scalar;

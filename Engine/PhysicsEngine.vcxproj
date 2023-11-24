@@ -21,10 +21,10 @@
   <ItemGroup>
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\NumericalIntegrator.hpp" />
-    <ClInclude Include="Source\Vector.h" />
+    <ClInclude Include="Source\Vector3.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Vector.cpp" />
+    <ClCompile Include="Source\Vector3.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
