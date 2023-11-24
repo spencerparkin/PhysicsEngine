@@ -24,6 +24,7 @@
     <ClInclude Include="Source\NumericalIntegrator.hpp" />
     <ClInclude Include="Source\PhysicsObject.h" />
     <ClInclude Include="Source\Quaternion.h" />
+    <ClInclude Include="Source\RigidBody.h" />
     <ClInclude Include="Source\Simulation.h" />
     <ClInclude Include="Source\Vector3.h" />
   </ItemGroup>
@@ -31,6 +32,7 @@
     <ClCompile Include="Source\Matrix3x3.cpp" />
     <ClCompile Include="Source\PhysicsObject.cpp" />
     <ClCompile Include="Source\Quaternion.cpp" />
+    <ClCompile Include="Source\RigidBody.cpp" />
     <ClCompile Include="Source\Simulation.cpp" />
     <ClCompile Include="Source\Vector3.cpp" />
   </ItemGroup>
