@@ -108,12 +108,11 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 		Matrix3x3 orientationInv(this->orientation);
 		orientationInv.Transpose();
 
-		Matrix3x3 inertiaTensor = this->orientation * this->bodySpaceInertiaTensor * orientationInv;
 		Matrix3x3 inertiaTensorInv = this->orientation * this->bodySpaceInertiaTensorInv * orientationInv;
 		
 		Vector3 angularVelocity = inertiaTensorInv * this->angularMomentum;
 		Matrix3x3 angularVelocityMatrix;
-		angularVelocityMatrix.OuterProduct(angularVelocity, angularVelocity);
+		angularVelocityMatrix.SetForCrossProduct(angularVelocity);
 
 		currentValueDerivative = angularVelocityMatrix * currentValue;
 	});

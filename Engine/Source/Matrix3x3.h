@@ -25,6 +25,7 @@ namespace PhysicsEngine
 		void SetRotation(const Quaternion& quat);
 		void GetRotation(Quaternion& quat) const;
 		void OuterProduct(const Vector3& vectorA, const Vector3& vectorB);
+		void SetForCrossProduct(const Vector3& vector);
 		bool Invert();
 		void Transpose();
 		bool Orthonormalize();

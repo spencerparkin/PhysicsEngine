@@ -145,6 +145,21 @@ void Matrix3x3::OuterProduct(const Vector3& vectorA, const Vector3& vectorB)
 	this->ele[2][2] = vectorA.z * vectorB.z;
 }
 
+void Matrix3x3::SetForCrossProduct(const Vector3& vector)
+{
+	this->ele[0][0] = 0.0;
+	this->ele[0][1] = vector.z;
+	this->ele[0][2] = -vector.y;
+
+	this->ele[1][0] = -vector.z;
+	this->ele[1][1] = 0.0;
+	this->ele[1][2] = vector.x;
+
+	this->ele[2][0] = vector.y;
+	this->ele[2][1] = -vector.x;
+	this->ele[2][2] = 0.0;
+}
+
 bool Matrix3x3::Invert()
 {
 	double det = this->Determinant();
