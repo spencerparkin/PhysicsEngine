@@ -29,19 +29,21 @@ Vector3::Vector3(double x, double y, double z)
 
 double Vector3::Length() const
 {
-	return ::sqrt(this->Dot(*this));
+	return ::sqrt(this->InnerProduct(*this));
 }
 
-double Vector3::Dot(const Vector3& vector) const
+double Vector3::InnerProduct(const Vector3& vector) const
 {
 	return this->x * vector.x + this->y * vector.y + this->z * vector.z;
 }
 
-void Vector3::Cross(const Vector3& vectorA, const Vector3& vectorB)
+Vector3 Vector3::CrossProduct(const Vector3& vector) const
 {
-	this->x = vectorA.y * vectorB.z - vectorA.z * vectorB.y;
-	this->y = vectorA.z * vectorB.x - vectorA.x * vectorB.z;
-	this->z = vectorA.x * vectorB.y - vectorA.y * vectorB.x;
+	Vector3 result;
+	result.x = this->y * vector.z - this->z * vector.y;
+	result.y = this->z * vector.x - this->x * vector.z;
+	result.z = this->x * vector.y - this->y * vector.x;
+	return result;
 }
 
 bool Vector3::Normalize(double* length /*= nullptr*/)

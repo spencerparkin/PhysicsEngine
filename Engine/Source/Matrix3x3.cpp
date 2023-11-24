@@ -123,6 +123,21 @@ void Matrix3x3::GetRotation(Quaternion& quat) const
 	quat.z = 0.25 * ::sqrt(PHY_ENG_SQUARED(r21 - r12) + PHY_ENG_SQUARED(r31 + r13) + PHY_ENG_SQUARED(r32 + r23) + PHY_ENG_SQUARED(r33 - r11 - r22 + 1.0)) * PHY_ENG_SIGN(r21 - r12);
 }
 
+void Matrix3x3::OuterProduct(const Vector3& vectorA, const Vector3& vectorB)
+{
+	this->ele[0][0] = vectorA.x * vectorB.x;
+	this->ele[0][1] = vectorA.y * vectorB.x;
+	this->ele[0][2] = vectorA.z * vectorB.x;
+
+	this->ele[1][0] = vectorA.x * vectorB.y;
+	this->ele[1][1] = vectorA.y * vectorB.y;
+	this->ele[1][2] = vectorA.z * vectorB.y;
+
+	this->ele[2][0] = vectorA.x * vectorB.z;
+	this->ele[2][1] = vectorA.y * vectorB.z;
+	this->ele[2][2] = vectorA.z * vectorB.z;
+}
+
 bool Matrix3x3::Invert()
 {
 	double det = this->Determinant();

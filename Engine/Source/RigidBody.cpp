@@ -14,3 +14,8 @@ RigidBody::RigidBody()
 {
 	return new RigidBody();
 }
+
+void RigidBody::MakeShape(const std::vector<Vector3>& pointArray, DensityFunc densityFunc)
+{
+	//...
+}

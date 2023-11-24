@@ -13,8 +13,8 @@ namespace PhysicsEngine
 		virtual ~Vector3();
 
 		double Length() const;
-		double Dot(const Vector3& vector) const;
-		void Cross(const Vector3& vectorA, const Vector3& vectorB);
+		double InnerProduct(const Vector3& vector) const;
+		Vector3 CrossProduct(const Vector3& vector) const;
 		bool Normalize(double* length = nullptr);
 		void Decompose(Vector3& projection, Vector3& rejection) const;
 		void Rotate(const Vector3& axis, double angle);

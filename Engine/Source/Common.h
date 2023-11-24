@@ -15,5 +15,7 @@
 #include <functional>
 #include <math.h>
 
+#define PHY_ENG_EPS				1e-7
+#define PHY_ENG_PI				3.1415926536
 #define PHY_ENG_SQUARED(x)		((x) * (x))
 #define PHY_ENG_SIGN(x)			((x) < 0 ? -1.0 : 1.0)
