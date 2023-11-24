@@ -44,4 +44,5 @@ namespace PhysicsEngine
 	PHYSICS_ENGINE_API Matrix3x3 operator/(const Matrix3x3& matA, const Matrix3x3& matB);
 	PHYSICS_ENGINE_API Matrix3x3 operator*(const Matrix3x3& mat, double scalar);
 	PHYSICS_ENGINE_API Matrix3x3 operator*(double scalar, const Matrix3x3& mat);
+	PHYSICS_ENGINE_API Vector3 operator*(const Matrix3x3& mat, const Vector3 vector);
 }

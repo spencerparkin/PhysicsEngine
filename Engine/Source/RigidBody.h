@@ -27,14 +27,20 @@ namespace PhysicsEngine
 		// It will be translated such that its center of mass is at the origin.
 		bool MakeShape(const std::vector<Vector3>& pointArray, double deltaLength, DensityFunc densityFunc);
 
+		virtual void PrepareForTick() override;
+		virtual void Tick(double deltaTime) override;
+
 	private:
 
 		double mass;
 		PolygonMesh mesh;
-		Matrix3x3 bodySpaceInertialTensor;
+		Matrix3x3 bodySpaceInertiaTensor;
+		Matrix3x3 bodySpaceInertiaTensorInv;
 		Vector3 position;
 		Matrix3x3 orientation;
 		Vector3 linearMomentum;
 		Vector3 angularMomentum;
+		Vector3 netForce;
+		Vector3 netTorque;
 	};
 }

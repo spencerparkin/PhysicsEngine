@@ -11,7 +11,10 @@ namespace PhysicsEngine
 		PhysicsObject();
 		virtual ~PhysicsObject();
 
-		//virtual void Step(...);
+		virtual void PrepareForTick();
+		virtual void Tick(double deltaTime);
+
+		//virtual void SolveConstraints(...);
 		//virtual void GetBoundingBox(...);
 	};
 }

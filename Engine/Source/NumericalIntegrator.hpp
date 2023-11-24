@@ -10,10 +10,12 @@ namespace PhysicsEngine
 	public:
 		NumericalIntegrator()
 		{
+			this->stabilizeFunc = new StabilizeFunc();
 		}
 
 		virtual ~NumericalIntegrator()
 		{
+			delete this->stabilizeFunc;
 		}
 
 		typedef std::function<void(double currentTime, const T& currentValue, T& currentValueDerivative)> DifferentialEquationFunc;
@@ -21,11 +23,11 @@ namespace PhysicsEngine
 
 		virtual void Integrate(const T& initialValue, T& finalFinal, double initialTime, double finalTime, DifferentialEquationFunc differentialEquationFunc) = 0;
 
-		StabilizeFunc stabilizeFunc;
+		StabilizeFunc* stabilizeFunc;
 	};
 
 	template<typename T>
-	class PHYSICS_ENGINE_API EulerIntegrator : public NumericalIntegrator
+	class PHYSICS_ENGINE_API EulerIntegrator : public NumericalIntegrator<T>
 	{
 	public:
 		EulerIntegrator(double maxTimeStep = 0.05)
@@ -36,6 +38,8 @@ namespace PhysicsEngine
 		virtual ~EulerIntegrator()
 		{
 		}
+
+		typedef std::function<void(double currentTime, const T& currentValue, T& currentValueDerivative)> DifferentialEquationFunc;
 
 		virtual void Integrate(const T& initialValue, T& finalFinal, double initialTime, double finalTime, DifferentialEquationFunc differentialEquationFunc) override
 		{
@@ -56,8 +60,8 @@ namespace PhysicsEngine
 
 				// If we're dealing with quaternions, this should re-normalize the quaternion.
 				// If we're dealing with rotation matrices, then this should re-orthonormalize the matrix.
-				if (this->stabilizeFunc)
-					this->stabilizeFunc(currentValue);
+				if (*this->stabilizeFunc)
+					(*this->stabilizeFunc)(currentValue);
 			}
 		}
 

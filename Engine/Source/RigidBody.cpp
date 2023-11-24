@@ -1,5 +1,6 @@
 #include "RigidBody.h"
 #include "AxisAlignedBoundingBox.h"
+#include "NumericalIntegrator.hpp"
 
 using namespace PhysicsEngine;
 
@@ -41,7 +42,7 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	Vector3 centerOfMass = totalMoments / this->mass;
 
 	// Calculate the body-space inertial tensor.  (I'm still not quite sure what this is, exactly.)
-	this->bodySpaceInertialTensor.SetZero();
+	this->bodySpaceInertiaTensor.SetZero();
 	box.VisitSubBoxes(deltaLength, [this, &densityFunc, &centerOfMass](const AxisAlignedBoundingBox& subBox) {
 		Vector3 particleCenter = subBox.Center();
 		if (this->mesh.ContainsPoint(particleCenter))
@@ -54,9 +55,14 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 			matrix.ele[0][0] += dot;
 			matrix.ele[1][1] += dot;
 			matrix.ele[2][2] += dot;
-			this->bodySpaceInertialTensor += matrix * particleMass;
+			this->bodySpaceInertiaTensor += matrix * particleMass;
 		}
 	});
+
+	// Cache the inverse of the inertial tensor as well.
+	this->bodySpaceInertiaTensorInv = this->bodySpaceInertiaTensor;
+	if (!this->bodySpaceInertiaTensorInv.Invert())
+		return false;
 
 	// Shift the mesh so that the center of mass is at origin in body space.
 	this->mesh.Translate(-centerOfMass);
@@ -68,4 +74,47 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	this->angularMomentum = Vector3(0.0, 0.0, 0.0);
 
 	return true;
+}
+
+/*virtual*/ void RigidBody::PrepareForTick()
+{
+	this->netForce = Vector3(0.0, 0.0, 0.0);
+	this->netTorque = Vector3(0.0, 0.0, 0.0);
+}
+
+/*virtual*/ void RigidBody::Tick(double deltaTime)
+{
+	EulerIntegrator<Vector3> vectorValuedIntegrator(deltaTime);
+
+	vectorValuedIntegrator.Integrate(this->linearMomentum, this->linearMomentum, 0.0, deltaTime, [this](double currentTime, const Vector3& currentValue, Vector3& currentValueDerivative) {
+		currentValueDerivative = this->netForce;
+	});
+
+	vectorValuedIntegrator.Integrate(this->position, this->position, 0.0, deltaTime, [this](double currentTime, const Vector3& currentValue, Vector3& currentValueDerivative) {
+		Vector3 velocity = this->linearMomentum / this->mass;
+		currentValueDerivative = velocity;
+	});
+
+	vectorValuedIntegrator.Integrate(this->angularMomentum, this->angularMomentum, 0.0, deltaTime, [this](double currentTime, const Vector3& currentValue, Vector3& currentValueDerivative) {
+		currentValueDerivative = this->netTorque;
+	});
+
+	EulerIntegrator<Matrix3x3> matrixValuedIntegrator(deltaTime);
+	*matrixValuedIntegrator.stabilizeFunc = [](Matrix3x3& currentValue) {
+		currentValue.Orthonormalize();
+	};
+
+	matrixValuedIntegrator.Integrate(this->orientation, this->orientation, 0.0, deltaTime, [this](double currentTime, const Matrix3x3& currentValue, Matrix3x3& currentValueDerivative) {
+		Matrix3x3 orientationInv(this->orientation);
+		orientationInv.Transpose();
+
+		Matrix3x3 inertiaTensor = this->orientation * this->bodySpaceInertiaTensor * orientationInv;
+		Matrix3x3 inertiaTensorInv = this->orientation * this->bodySpaceInertiaTensorInv * orientationInv;
+		
+		Vector3 angularVelocity = inertiaTensorInv * this->angularMomentum;
+		Matrix3x3 angularVelocityMatrix;
+		angularVelocityMatrix.OuterProduct(angularVelocity, angularVelocity);
+
+		currentValueDerivative = angularVelocityMatrix * currentValue;
+	});
 }

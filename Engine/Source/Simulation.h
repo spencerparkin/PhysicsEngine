@@ -21,7 +21,7 @@ namespace PhysicsEngine
 		}
 
 		void Clear();
-		void Step(double deltaTime);
+		void Tick(double deltaTime);
 
 	private:
 
@@ -29,6 +29,5 @@ namespace PhysicsEngine
 		//       spacial partitioning data-structure, but this is fine
 		//       for now.
 		std::vector<PhysicsObject*>* physicsObjectArray;
-		double currentTime;
 	};
 }

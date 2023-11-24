@@ -5,7 +5,6 @@ using namespace PhysicsEngine;
 
 Simulation::Simulation()
 {
-	this->currentTime = 0.0;
 	this->physicsObjectArray = new std::vector<PhysicsObject*>();
 }
 
@@ -24,7 +23,15 @@ void Simulation::Clear()
 	this->physicsObjectArray->clear();
 }
 
-void Simulation::Step(double deltaTime)
+void Simulation::Tick(double deltaTime)
 {
-	//...
+	for (PhysicsObject* physicsObject : *this->physicsObjectArray)
+		physicsObject->PrepareForTick();
+
+	// TODO: Accumulate forces and torque.
+
+	for (PhysicsObject* physicsObject : *this->physicsObjectArray)
+		physicsObject->Tick(deltaTime);
+
+	// TODO: Resolve constraints?
 }

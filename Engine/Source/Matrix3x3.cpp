@@ -305,4 +305,9 @@ namespace PhysicsEngine
 				result.ele[i][j] = mat.ele[i][j] * scalar;
 		return result;
 	}
+
+	Vector3 operator*(const Matrix3x3& mat, const Vector3 vector)
+	{
+		return mat.TransformPoint(vector);
+	}
 }
