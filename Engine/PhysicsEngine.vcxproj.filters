@@ -13,7 +13,7 @@
     <ClInclude Include="Source\Common.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\NumericalIntegrator.hpp">
+    <ClInclude Include="Source\NumericalIntegrator.h">
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\AxisAlignedBoundingBox.h">
@@ -43,6 +43,9 @@
     <ClInclude Include="Source\RigidBody.h">
       <Filter>Source\PhysicsObjects</Filter>
     </ClInclude>
+    <ClInclude Include="Source\VectorN.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp">
@@ -71,6 +74,12 @@
     </ClCompile>
     <ClCompile Include="Source\RigidBody.cpp">
       <Filter>Source\PhysicsObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VectorN.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\NumericalIntegrator.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

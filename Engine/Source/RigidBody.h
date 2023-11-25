@@ -8,6 +8,7 @@
 namespace PhysicsEngine
 {
 	class Vector3;
+	class VectorN;
 
 	// Unlike a particle which is a single point-mass, here, a rigid-body represents
 	// an orientable volume of mass with custom density distribution.  Its shape will
@@ -35,6 +36,9 @@ namespace PhysicsEngine
 		virtual void Tick(double deltaTime) override;
 
 	private:
+
+		bool StateToVectorN(VectorN& stateVector) const;
+		bool StateFromVectorN(const VectorN& stateVector);
 
 		double mass;
 		PolygonMesh mesh;

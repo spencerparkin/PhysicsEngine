@@ -22,7 +22,7 @@
     <ClInclude Include="Source\AxisAlignedBoundingBox.h" />
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\Matrix3x3.h" />
-    <ClInclude Include="Source\NumericalIntegrator.hpp" />
+    <ClInclude Include="Source\NumericalIntegrator.h" />
     <ClInclude Include="Source\PhysicsObject.h" />
     <ClInclude Include="Source\Plane.h" />
     <ClInclude Include="Source\PolygonMesh.h" />
@@ -30,10 +30,12 @@
     <ClInclude Include="Source\RigidBody.h" />
     <ClInclude Include="Source\Simulation.h" />
     <ClInclude Include="Source\Vector3.h" />
+    <ClInclude Include="Source\VectorN.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp" />
     <ClCompile Include="Source\Matrix3x3.cpp" />
+    <ClCompile Include="Source\NumericalIntegrator.cpp" />
     <ClCompile Include="Source\PhysicsObject.cpp" />
     <ClCompile Include="Source\Plane.cpp" />
     <ClCompile Include="Source\PolygonMesh.cpp" />
@@ -41,6 +43,7 @@
     <ClCompile Include="Source\RigidBody.cpp" />
     <ClCompile Include="Source\Simulation.cpp" />
     <ClCompile Include="Source\Vector3.cpp" />
+    <ClCompile Include="Source\VectorN.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

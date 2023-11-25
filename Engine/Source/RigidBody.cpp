@@ -1,6 +1,7 @@
 #include "RigidBody.h"
 #include "AxisAlignedBoundingBox.h"
-#include "NumericalIntegrator.hpp"
+#include "NumericalIntegrator.h"
+#include "VectorN.h"
 
 using namespace PhysicsEngine;
 
@@ -95,36 +96,101 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 
 /*virtual*/ void RigidBody::Tick(double deltaTime)
 {
-	EulerIntegrator<Vector3> vectorValuedIntegrator(deltaTime);
+	EulerIntegrator integrator(deltaTime / 4.0);
 
-	vectorValuedIntegrator.Integrate(this->linearMomentum, this->linearMomentum, 0.0, deltaTime, [this](double currentTime, const Vector3& currentValue, Vector3& currentValueDerivative) {
-		currentValueDerivative = this->netForce;
-	});
+	VectorN currentState;
+	this->StateToVectorN(currentState);
 
-	vectorValuedIntegrator.Integrate(this->position, this->position, 0.0, deltaTime, [this](double currentTime, const Vector3& currentValue, Vector3& currentValueDerivative) {
+	VectorN newState;
+	integrator.Integrate(currentState, newState, 0.0, deltaTime, [this](const VectorN& currentState, double currentTime, VectorN& currentStateDerivative) {
+		this->StateFromVectorN(currentState);
+
+		currentStateDerivative.SetDimension(currentState.GetDimension());
+
+		int i = 0;
+
 		Vector3 velocity = this->linearMomentum / this->mass;
-		currentValueDerivative = velocity;
-	});
 
-	vectorValuedIntegrator.Integrate(this->angularMomentum, this->angularMomentum, 0.0, deltaTime, [this](double currentTime, const Vector3& currentValue, Vector3& currentValueDerivative) {
-		currentValueDerivative = this->netTorque;
-	});
+		currentStateDerivative[i++] = velocity.x;
+		currentStateDerivative[i++] = velocity.y;
+		currentStateDerivative[i++] = velocity.z;
 
-	EulerIntegrator<Matrix3x3> matrixValuedIntegrator(deltaTime);
-	*matrixValuedIntegrator.stabilizeFunc = [](Matrix3x3& currentValue) {
-		currentValue.Orthonormalize();
-	};
+		this->orientation.Orthonormalize();
 
-	matrixValuedIntegrator.Integrate(this->orientation, this->orientation, 0.0, deltaTime, [this](double currentTime, const Matrix3x3& currentValue, Matrix3x3& currentValueDerivative) {
 		Matrix3x3 orientationInv(this->orientation);
 		orientationInv.Transpose();
 
 		Matrix3x3 inertiaTensorInv = this->orientation * this->bodySpaceInertiaTensorInv * orientationInv;
-		
+
 		Vector3 angularVelocity = inertiaTensorInv * this->angularMomentum;
 		Matrix3x3 angularVelocityMatrix;
 		angularVelocityMatrix.SetForCrossProduct(angularVelocity);
 
-		currentValueDerivative = angularVelocityMatrix * currentValue;
+		Matrix3x3 orientationDerivative = angularVelocityMatrix * this->orientation;
+
+		for (int r = 0; r < 3; r++)
+			for (int c = 0; c < 3; c++)
+				currentStateDerivative[i++] = orientationDerivative.ele[r][c];
+
+		currentStateDerivative[i++] = this->netForce.x;
+		currentStateDerivative[i++] = this->netForce.y;
+		currentStateDerivative[i++] = this->netForce.z;
+
+		currentStateDerivative[i++] = this->netTorque.x;
+		currentStateDerivative[i++] = this->netTorque.y;
+		currentStateDerivative[i++] = this->netTorque.z;
 	});
+
+	this->StateFromVectorN(newState);
+}
+
+bool RigidBody::StateToVectorN(VectorN& stateVector) const
+{
+	stateVector.SetDimension(18);
+
+	int i = 0;
+
+	stateVector[i++] = this->position.x;
+	stateVector[i++] = this->position.y;
+	stateVector[i++] = this->position.z;
+
+	for (int r = 0; r < 3; r++)
+		for (int c = 0; c < 3; c++)
+			stateVector[i++] = this->orientation.ele[r][c];
+
+	stateVector[i++] = this->netForce.x;
+	stateVector[i++] = this->netForce.y;
+	stateVector[i++] = this->netForce.z;
+
+	stateVector[i++] = this->netTorque.x;
+	stateVector[i++] = this->netTorque.y;
+	stateVector[i++] = this->netTorque.z;
+
+	return true;
+}
+
+bool RigidBody::StateFromVectorN(const VectorN& stateVector)
+{
+	if (stateVector.GetDimension() != 18)
+		return false;
+
+	int i = 0;
+
+	this->position.x = stateVector[i++];
+	this->position.y = stateVector[i++];
+	this->position.z = stateVector[i++];
+
+	for (int r = 0; r < 3; r++)
+		for (int c = 0; c < 3; c++)
+			this->orientation.ele[r][c] = stateVector[i++];
+
+	this->netForce.x = stateVector[i++];
+	this->netForce.y = stateVector[i++];
+	this->netForce.z = stateVector[i++];
+
+	this->netTorque.x = stateVector[i++];
+	this->netTorque.y = stateVector[i++];
+	this->netTorque.z = stateVector[i++];
+
+	return true;
 }
