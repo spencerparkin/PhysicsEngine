@@ -41,21 +41,32 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	});
 	Vector3 centerOfMass = totalMoments / this->mass;
 
-	// Calculate the body-space inertial tensor.  (I'm still not quite sure what this is, exactly.)
+	// Calculate the body-space inertial tensor.  Note that in finding the relationship between
+	// angular velocity and angular momentum, we get L = int(r x (w x r) dm).  Here, r is the position
+	// of a particle in the body, w is the angular momentum, dm is the mass of the particle, and
+	// we're integrating over all the particles of the objects.  Doing some rearrangement, this equation
+	// can be re-written as L = I*w, where I is a matrix (or rank 2 tensor.)  This matrix, however,
+	// is not constant, because it depends on the orientation of the body.  Fortunately, it can be shown
+	// that the world-space inertia tensor I_{world} = R*I_{body}*R^T, where R is the current orientation
+	// of the body.
 	this->bodySpaceInertiaTensor.SetZero();
 	box.VisitSubBoxes(deltaLength, [this, &densityFunc, &centerOfMass](const AxisAlignedBoundingBox& subBox) {
 		Vector3 particleCenter = subBox.Center();
 		if (this->mesh.ContainsPoint(particleCenter))
 		{
 			double particleMass = densityFunc(particleCenter) * subBox.Volume();
-			Vector3 particleVector = particleCenter - centerOfMass;
-			Matrix3x3 matrix;
-			matrix.OuterProduct(particleVector, -particleVector);
-			double dot = particleVector.InnerProduct(particleVector);
-			matrix.ele[0][0] += dot;
-			matrix.ele[1][1] += dot;
-			matrix.ele[2][2] += dot;
-			this->bodySpaceInertiaTensor += matrix * particleMass;
+			Vector3 r = particleCenter - centerOfMass;
+			Matrix3x3 partialInertiaTensor;
+			partialInertiaTensor.ele[0][0] = r.y * r.y + r.z * r.z;
+			partialInertiaTensor.ele[0][1] = -r.x * r.y;
+			partialInertiaTensor.ele[0][2] = r.x * r.z;
+			partialInertiaTensor.ele[1][0] = -r.y * r.x;
+			partialInertiaTensor.ele[1][1] = r.x * r.x + r.z * r.z;
+			partialInertiaTensor.ele[1][2] = -r.y * r.z;
+			partialInertiaTensor.ele[2][0] = -r.z * r.x;
+			partialInertiaTensor.ele[2][1] = -r.z * r.y;
+			partialInertiaTensor.ele[2][2] = r.x * r.x + r.y * r.y;
+			this->bodySpaceInertiaTensor += partialInertiaTensor * particleMass;
 		}
 	});
 

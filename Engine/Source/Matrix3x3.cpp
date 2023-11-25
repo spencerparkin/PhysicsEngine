@@ -26,7 +26,7 @@ Matrix3x3::Matrix3x3(const Vector3& xAxis, const Vector3& yAxis, const Vector3& 
 double Matrix3x3::Determinant() const
 {
 	return
-		+this->ele[0][0] * (this->ele[1][1] * this->ele[2][2] - this->ele[2][1] * this->ele[1][2])
+		+ this->ele[0][0] * (this->ele[1][1] * this->ele[2][2] - this->ele[2][1] * this->ele[1][2])
 		- this->ele[0][1] * (this->ele[1][0] * this->ele[2][2] - this->ele[2][0] * this->ele[1][2])
 		+ this->ele[0][2] * (this->ele[1][0] * this->ele[2][1] - this->ele[2][0] * this->ele[1][1]);
 }
