@@ -50,7 +50,8 @@ namespace PhysicsEngine
 				T currentStateDerivative;
 				differentialEquationFunc(currentState, currentTime, currentStateDerivative);
 
-				currentState += currentStateDerivative * currentTime;
+				currentState += currentStateDerivative * deltaTime;
+				currentTime += deltaTime;
 			}
 		}
 

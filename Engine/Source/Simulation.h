@@ -21,7 +21,7 @@ namespace PhysicsEngine
 		}
 
 		void Clear();
-		void Tick(double deltaTime);
+		void Tick();
 		int GetNumPhysicsObjects();
 		PhysicsObject* GetPhysicsObject(int i);
 
@@ -31,5 +31,8 @@ namespace PhysicsEngine
 		//       spacial partitioning data-structure, but this is fine
 		//       for now.
 		std::vector<PhysicsObject*>* physicsObjectArray;
+
+		double currentTime;
+		double maxDeltaTime;
 	};
 }

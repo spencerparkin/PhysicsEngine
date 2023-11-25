@@ -6,6 +6,8 @@ using namespace PhysicsEngine;
 Simulation::Simulation()
 {
 	this->physicsObjectArray = new std::vector<PhysicsObject*>();
+	this->currentTime = 0.0;
+	this->maxDeltaTime = 0.5;
 }
 
 /*virtual*/ Simulation::~Simulation()
@@ -23,8 +25,25 @@ void Simulation::Clear()
 	this->physicsObjectArray->clear();
 }
 
-void Simulation::Tick(double deltaTime)
+void Simulation::Tick()
 {
+	if (this->currentTime == 0.0)
+	{
+		// This is our first tick.  Just initialize time and bail.
+		this->currentTime = double(::clock()) / double(CLOCKS_PER_SEC);
+		return;
+	}
+	
+	double presentTime = double(::clock()) / double(CLOCKS_PER_SEC);
+	double deltaTime = presentTime - this->currentTime;
+	this->currentTime = presentTime;
+	if (deltaTime > this->maxDeltaTime)
+	{
+		// The idea here is to prevent a debugger break, followed by a resume of
+		// the program from creating a very large time-step in the simulation.
+		return;
+	}
+
 	for (PhysicsObject* physicsObject : *this->physicsObjectArray)
 		physicsObject->PrepareForTick();
 

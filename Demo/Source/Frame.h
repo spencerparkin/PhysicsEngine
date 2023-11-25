@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wx/frame.h>
+#include <wx/timer.h>
 
 class Canvas;
 
@@ -12,6 +13,7 @@ public:
 
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+	void OnTimer(wxTimerEvent& event);
 
 	enum
 	{
@@ -20,4 +22,6 @@ public:
 	};
 
 	Canvas* canvas;
+	wxTimer timer;
+	bool inTimer;
 };

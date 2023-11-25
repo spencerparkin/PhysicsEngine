@@ -9,6 +9,7 @@ VectorN::VectorN()
 
 VectorN::VectorN(const VectorN& vector)
 {
+	this->scalarArray = new std::vector<double>();
 	*this = vector;
 }
 
