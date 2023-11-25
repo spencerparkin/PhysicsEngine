@@ -49,6 +49,12 @@
     <ClInclude Include="Source\Gravity.h">
       <Filter>Source\PhysicsObjects</Filter>
     </ClInclude>
+    <ClInclude Include="Source\JediForce.h">
+      <Filter>Source\PhysicsObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PhysicalObject.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp">
@@ -83,6 +89,12 @@
     </ClCompile>
     <ClCompile Include="Source\Gravity.cpp">
       <Filter>Source\PhysicsObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\JediForce.cpp">
+      <Filter>Source\PhysicsObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PhysicalObject.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PhysicsObject.h"
+#include "PhysicalObject.h"
 #include "PolygonMesh.h"
 #include "Matrix3x3.h"
 #include "Vector3.h"
@@ -14,7 +14,7 @@ namespace PhysicsEngine
 	// an orientable volume of mass with custom density distribution.  Its shape will
 	// be defined as a convex polygonal mesh.  This is all based on David Baraff's
 	// series of papers, "An Introduction to Physically Based Modeling".
-	class PHYSICS_ENGINE_API RigidBody : public PhysicsObject
+	class PHYSICS_ENGINE_API RigidBody : public PhysicalObject
 	{
 	public:
 		RigidBody();
@@ -33,11 +33,11 @@ namespace PhysicsEngine
 		const Matrix3x3& GetOrientation() const { return this->orientation; }
 		void SetLocation(const Vector3& location) { this->position = location; }
 		void SetOrientation(const Matrix3x3& orientation) { this->orientation = orientation; }
-		double GetMass() const { return this->mass; }
-		void AccumulateForce(const Vector3& force) { this->netForce += force; }
 
 		virtual void PrepareForTick(Simulation* sim) override;
 		virtual void Integrate(Simulation* sim, double deltaTime) override;
+		virtual double GetMass() const override;
+		virtual void AccumulateForce(const Vector3& force) override;
 
 	private:
 

@@ -194,3 +194,13 @@ bool RigidBody::StateFromVectorN(const VectorN& stateVector)
 
 	return true;
 }
+
+/*virtual*/ double RigidBody::GetMass() const
+{
+	return this->mass;
+}
+
+/*virtual*/ void RigidBody::AccumulateForce(const Vector3& force)
+{
+	this->netForce += force;
+}

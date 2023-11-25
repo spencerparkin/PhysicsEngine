@@ -1,5 +1,5 @@
 #include "Gravity.h"
-#include "RigidBody.h"
+#include "PhysicalObject.h"
 #include "Simulation.h"
 
 using namespace PhysicsEngine;
@@ -21,15 +21,15 @@ Gravity::Gravity()
 
 /*virtual*/ void Gravity::ApplyForces(Simulation* sim)
 {
+	// Gravity is just universally applied to all physical objects of the simulation.
 	Simulation::PhysicsObjectMap& physicsObjectMap = sim->GetPhysicsObjectMap();
 	for (auto pair : physicsObjectMap)
 	{
-		PhysicsObject* physicsObject = pair.second;
-		RigidBody* rigidBody = dynamic_cast<RigidBody*>(physicsObject);
-		if (rigidBody)
+		PhysicalObject* physicalObject = dynamic_cast<PhysicalObject*>(pair.second);
+		if (physicalObject)
 		{
-			Vector3 gravityForce = rigidBody->GetMass() * this->direction * this->acceleration;
-			rigidBody->AccumulateForce(gravityForce);
+			Vector3 gravityForce = physicalObject->GetMass() * this->direction * this->acceleration;
+			physicalObject->AccumulateForce(gravityForce);
 		}
 	}
 }

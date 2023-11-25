@@ -22,8 +22,10 @@
     <ClInclude Include="Source\AxisAlignedBoundingBox.h" />
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\Gravity.h" />
+    <ClInclude Include="Source\JediForce.h" />
     <ClInclude Include="Source\Matrix3x3.h" />
     <ClInclude Include="Source\NumericalIntegrator.hpp" />
+    <ClInclude Include="Source\PhysicalObject.h" />
     <ClInclude Include="Source\PhysicsObject.h" />
     <ClInclude Include="Source\Plane.h" />
     <ClInclude Include="Source\PolygonMesh.h" />
@@ -36,7 +38,9 @@
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp" />
     <ClCompile Include="Source\Gravity.cpp" />
+    <ClCompile Include="Source\JediForce.cpp" />
     <ClCompile Include="Source\Matrix3x3.cpp" />
+    <ClCompile Include="Source\PhysicalObject.cpp" />
     <ClCompile Include="Source\PhysicsObject.cpp" />
     <ClCompile Include="Source\Plane.cpp" />
     <ClCompile Include="Source\PolygonMesh.cpp" />
