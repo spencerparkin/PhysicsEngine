@@ -31,6 +31,8 @@ namespace PhysicsEngine
 		const PolygonMesh& GetMesh() const { return this->mesh; }
 		const Vector3& GetLocation() const { return this->position; }
 		const Matrix3x3& GetOrientation() const { return this->orientation; }
+		void SetLocation(const Vector3& location) { this->position = location; }
+		void SetOrientation(const Matrix3x3& orientation) { this->orientation = orientation; }
 
 		virtual void PrepareForTick() override;
 		virtual void Tick(double deltaTime) override;

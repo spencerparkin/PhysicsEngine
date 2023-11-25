@@ -18,6 +18,25 @@ Box::Box()
 	return new Box();
 }
 
+bool Box::Setup(const Vector3& dimensions, const Vector3& initialPosition)
+{
+	std::vector<Vector3> pointArray;
+	pointArray.push_back(Vector3(-3.0, -3.0, -3.0) + Vector3(2.0, 2.0, 0.0));
+	pointArray.push_back(Vector3(3.0, -3.0, -3.0) + Vector3(2.0, 2.0, 0.0));
+	pointArray.push_back(Vector3(3.0, 3.0, -3.0) + Vector3(2.0, 2.0, 0.0));
+	pointArray.push_back(Vector3(-3.0, 3.0, -3.0) + Vector3(2.0, 2.0, 0.0));
+	pointArray.push_back(Vector3(-3.0, -3.0, 3.0) + Vector3(2.0, 2.0, 0.0));
+	pointArray.push_back(Vector3(3.0, -3.0, 3.0) + Vector3(2.0, 2.0, 0.0));
+	pointArray.push_back(Vector3(3.0, 3.0, 3.0) + Vector3(2.0, 2.0, 0.0));
+	pointArray.push_back(Vector3(-3.0, 3.0, 3.0) + Vector3(2.0, 2.0, 0.0));
+
+	if (!this->MakeShape(pointArray, 0.2, [](const Vector3& point) -> double { return 1.0; }))
+		return false;
+
+	this->SetLocation(initialPosition);
+	return true;
+}
+
 /*virtual*/ void Box::DeleteSelf()
 {
 	delete this;

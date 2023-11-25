@@ -21,21 +21,10 @@ Application::Application()
 	if (!wxApp::OnInit())
 		return false;
 
-	std::vector<Vector3> pointArray;
-	pointArray.push_back(Vector3(-3.0, -3.0, -3.0));
-	pointArray.push_back(Vector3(3.0, -3.0, -3.0));
-	pointArray.push_back(Vector3(3.0, 3.0, -3.0));
-	pointArray.push_back(Vector3(-3.0, 3.0, -3.0));
-	pointArray.push_back(Vector3(-3.0, -3.0, 3.0));
-	pointArray.push_back(Vector3(3.0, -3.0, 3.0));
-	pointArray.push_back(Vector3(3.0, 3.0, 3.0));
-	pointArray.push_back(Vector3(-3.0, 3.0, 3.0));
-
 	auto box = this->simulation.AddPhysicsObject<Box>();
-	if (!box->MakeShape(pointArray, 0.2, [](const Vector3& point) -> double { return 1.0; }))
+	if (!box->Setup(Vector3(3.0, 3.0, 3.0), Vector3(0.0, 0.0, 0.0)))
 	{
-		wxMessageBox("Failed to create rigid body shape!", "Error", wxOK | wxICON_ERROR, nullptr);
-		return false;
+		wxMessageBox("Failed to setup box!", "Error", wxOK | wxICON_ERROR, nullptr);
 	}
 
 	this->frame = new Frame(wxDefaultPosition, wxSize(1200, 800));
