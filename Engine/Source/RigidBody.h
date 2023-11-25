@@ -28,6 +28,8 @@ namespace PhysicsEngine
 		bool MakeShape(const std::vector<Vector3>& pointArray, double deltaLength, DensityFunc densityFunc);
 
 		const PolygonMesh& GetMesh() const { return this->mesh; }
+		const Vector3& GetLocation() const { return this->position; }
+		const Matrix3x3& GetOrientation() const { return this->orientation; }
 
 		virtual void PrepareForTick() override;
 		virtual void Tick(double deltaTime) override;

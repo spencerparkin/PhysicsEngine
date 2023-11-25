@@ -29,6 +29,8 @@ namespace PhysicsEngine
 			bool HasVertex(int i) const;
 			bool AllPointsOnPlane(const Plane& plane, const std::vector<Vector3>& pointArray) const;
 			bool MakePlane(Plane& plane, const std::vector<Vector3>& pointArray) const;
+			int GetNumVertices() const;
+			const Vector3& GetVertex(int i, const PolygonMesh& polygonMesh) const;
 
 		private:
 			std::vector<int>* vertexArray;
@@ -39,6 +41,9 @@ namespace PhysicsEngine
 		bool ContainsPoint(const Vector3& point) const;		// This assumes the mesh forms a convex hull.
 		bool CalcBoundingBox(AxisAlignedBoundingBox& aabb) const;
 		void Translate(const Vector3& translationDelta);
+		int GetNumPolygons() const;
+		const Polygon* GetPolygon(int i) const;
+		const std::vector<Vector3>& GetVertexArray() const { return *this->vertexArray; }
 
 	private:
 

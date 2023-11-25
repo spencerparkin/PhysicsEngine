@@ -244,6 +244,19 @@ void PolygonMesh::Translate(const Vector3& translationDelta)
 		vertex += translationDelta;
 }
 
+int PolygonMesh::GetNumPolygons() const
+{
+	return (int)this->polygonArray->size();
+}
+
+const PolygonMesh::Polygon* PolygonMesh::GetPolygon(int i) const
+{
+	if (i < 0 || i >= (int)this->polygonArray->size())
+		return nullptr;
+
+	return (*this->polygonArray)[i];
+}
+
 //------------------------------------ PolygonMesh::Polygon ------------------------------------
 
 PolygonMesh::Polygon::Polygon()
@@ -259,6 +272,21 @@ PolygonMesh::Polygon::Polygon()
 void PolygonMesh::Polygon::Clear()
 {
 	this->vertexArray->clear();
+}
+
+int PolygonMesh::Polygon::GetNumVertices() const
+{
+	return (int)this->vertexArray->size();
+}
+
+const Vector3& PolygonMesh::Polygon::GetVertex(int i, const PolygonMesh& polygonMesh) const
+{
+	if (i < 0)
+		i = 0;
+	else if (i >= (int)this->vertexArray->size())
+		i = (int)this->vertexArray->size() - 1;
+
+	return (*polygonMesh.vertexArray)[(*this->vertexArray)[i]];
 }
 
 PolygonMesh::Polygon* PolygonMesh::Polygon::MergeWith(const Polygon* polygon, const std::vector<Vector3>& pointArray) const
