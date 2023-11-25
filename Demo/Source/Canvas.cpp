@@ -11,8 +11,9 @@ int Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 
 Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList)
 {
-	this->cameraEye = Vector3(10.0, 5.0, 10.0);
+	this->cameraEye = Vector3(20.0, 10.0, 20.0);
 	this->cameraSubject = Vector3(0.0, 0.0, 0.0);
+	this->lightPosition = Vector3(10.0, 10.0, 0.0);
 
 	this->Bind(wxEVT_PAINT, &Canvas::OnPaint, this);
 	this->Bind(wxEVT_SIZE, &Canvas::OnSize, this);
@@ -55,6 +56,8 @@ void Canvas::OnPaint(wxPaintEvent& event)
 	glLineWidth(1.5f);
 	glBegin(GL_LINES);
 
+	glDisable(GL_LIGHTING);
+
 	// Draw X-axis.
 	glColor3d(1.0, 0.0, 0.0);
 	glVertex3d(0.0, 0.0, 0.0);
@@ -71,6 +74,16 @@ void Canvas::OnPaint(wxPaintEvent& event)
 	glVertex3d(0.0, 0.0, 1.0);
 
 	glEnd();
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	GLfloat lightColor[] = { 1.f, 1.f, 1.f, 1.f };
+	GLfloat lightPos[] = { (GLfloat)this->lightPosition.x, (GLfloat)this->lightPosition.y, (GLfloat)this->lightPosition.z, 1.0f };
+	GLfloat lightSpec[] = { 0.1f, 0.1f, 0.1f, 0.1f };
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpec);
 
 	int numObjects = wxGetApp().simulation.GetNumPhysicsObjects();
 	for (int i = 0; i < numObjects; i++)

@@ -21,4 +21,5 @@ private:
 	static int attributeList[];
 	PhysicsEngine::Vector3 cameraEye;
 	PhysicsEngine::Vector3 cameraSubject;
+	PhysicsEngine::Vector3 lightPosition;
 };
