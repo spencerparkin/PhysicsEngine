@@ -379,7 +379,10 @@ bool PolygonMesh::Polygon::MakePlane(Plane& plane, const std::vector<Vector3>& p
 		{
 			for (int k = j + 1; k < (signed)this->vertexArray->size(); k++)
 			{
-				Triangle triangle{ i, j, k };
+				Triangle triangle;
+				triangle.vertex[0] = (*this->vertexArray)[i];
+				triangle.vertex[1] = (*this->vertexArray)[j];
+				triangle.vertex[2] = (*this->vertexArray)[k];
 				double area = triangle.CalcArea(pointArray);
 				if (area > largestArea)
 				{

@@ -192,26 +192,44 @@ bool AxisAlignedBoundingBox::CalcUVWs(const Vector3& point, Vector3& texCoords) 
 	return true;
 }
 
+bool AxisAlignedBoundingBox::CalcPoint(Vector3& point, const Vector3& texCoords) const
+{
+	point.x = this->min.x + texCoords.x * (this->max.x - this->min.x);
+	point.y = this->min.y + texCoords.y * (this->max.y - this->min.y);
+	point.z = this->min.z + texCoords.z * (this->max.z - this->min.z);
+
+	return true;
+}
+
 void AxisAlignedBoundingBox::VisitSubBoxes(double deltaLength, VisitationFunc visitationFunc)
 {
 	if (!this->IsValid() || deltaLength <= 0.0)
 		return;
 
-	for (double x = this->min.x; x + deltaLength < this->max.x; x += deltaLength)
+	int widthSegments = (int)::round(this->Width() / deltaLength);
+	int heightSegments = (int)::round(this->Height() / deltaLength);
+	int depthSegments = (int)::round(this->Depth() / deltaLength);
+
+	for (int i = 0; i < widthSegments; i++)
 	{
-		for (double y = this->min.y; y + deltaLength < this->max.y; y += deltaLength)
+		for (int j = 0; j < heightSegments; j++)
 		{
-			for (double z = this->min.z; z + deltaLength < this->max.z; z += deltaLength)
+			for (int k = 0; k < depthSegments; k++)
 			{
 				AxisAlignedBoundingBox subBox;
 
-				subBox.min.x = x;
-				subBox.min.y = y;
-				subBox.min.z = z;
+				Vector3 minCorner, maxCorner;
 
-				subBox.max.x = (x + deltaLength < this->max.x) ? (x + deltaLength) : this->max.x;
-				subBox.max.y = (y + deltaLength < this->max.y) ? (y + deltaLength) : this->max.y;
-				subBox.max.z = (z + deltaLength < this->max.z) ? (z + deltaLength) : this->max.z;
+				minCorner.x = double(i) / double(widthSegments);
+				minCorner.y = double(j) / double(heightSegments);
+				minCorner.z = double(k) / double(depthSegments);
+
+				maxCorner.x = double(i + 1) / double(widthSegments);
+				maxCorner.y = double(j + 1) / double(heightSegments);
+				maxCorner.z = double(k + 1) / double(depthSegments);
+
+				this->CalcPoint(subBox.min, minCorner);
+				this->CalcPoint(subBox.max, maxCorner);
 
 				visitationFunc(subBox);
 			}

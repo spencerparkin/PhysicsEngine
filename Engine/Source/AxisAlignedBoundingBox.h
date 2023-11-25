@@ -37,6 +37,7 @@ namespace PhysicsEngine
 		void SplitReasonably(AxisAlignedBoundingBox& aabbA, AxisAlignedBoundingBox& aabbB) const;
 
 		bool CalcUVWs(const Vector3& point, Vector3& texCoords) const;
+		bool CalcPoint(Vector3& point, const Vector3& texCoords) const;
 
 		typedef std::function<void(const AxisAlignedBoundingBox&)> VisitationFunc;
 

@@ -56,17 +56,17 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 		{
 			double particleMass = densityFunc(particleCenter) * subBox.Volume();
 			Vector3 r = particleCenter - centerOfMass;
-			Matrix3x3 partialInertiaTensor;
-			partialInertiaTensor.ele[0][0] = r.y * r.y + r.z * r.z;
-			partialInertiaTensor.ele[0][1] = -r.x * r.y;
-			partialInertiaTensor.ele[0][2] = r.x * r.z;
-			partialInertiaTensor.ele[1][0] = -r.y * r.x;
-			partialInertiaTensor.ele[1][1] = r.x * r.x + r.z * r.z;
-			partialInertiaTensor.ele[1][2] = -r.y * r.z;
-			partialInertiaTensor.ele[2][0] = -r.z * r.x;
-			partialInertiaTensor.ele[2][1] = -r.z * r.y;
-			partialInertiaTensor.ele[2][2] = r.x * r.x + r.y * r.y;
-			this->bodySpaceInertiaTensor += partialInertiaTensor * particleMass;
+			Matrix3x3 particleInertiaTensor;
+			particleInertiaTensor.ele[0][0] = r.y * r.y + r.z * r.z;
+			particleInertiaTensor.ele[0][1] = -r.x * r.y;
+			particleInertiaTensor.ele[0][2] = r.x * r.z;
+			particleInertiaTensor.ele[1][0] = -r.y * r.x;
+			particleInertiaTensor.ele[1][1] = r.x * r.x + r.z * r.z;
+			particleInertiaTensor.ele[1][2] = -r.y * r.z;
+			particleInertiaTensor.ele[2][0] = -r.z * r.x;
+			particleInertiaTensor.ele[2][1] = -r.z * r.y;
+			particleInertiaTensor.ele[2][2] = r.x * r.x + r.y * r.y;
+			this->bodySpaceInertiaTensor += particleInertiaTensor * particleMass;
 		}
 	});
 
