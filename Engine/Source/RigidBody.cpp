@@ -1,6 +1,6 @@
 #include "RigidBody.h"
 #include "AxisAlignedBoundingBox.h"
-#include "NumericalIntegrator.h"
+#include "NumericalIntegrator.hpp"
 #include "VectorN.h"
 
 using namespace PhysicsEngine;
@@ -96,7 +96,7 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 
 /*virtual*/ void RigidBody::Tick(double deltaTime)
 {
-	EulerIntegrator integrator(deltaTime / 4.0);
+	EulerIntegrator<VectorN> integrator(deltaTime / 4.0);
 
 	VectorN currentState;
 	this->StateToVectorN(currentState);
@@ -158,13 +158,13 @@ bool RigidBody::StateToVectorN(VectorN& stateVector) const
 		for (int c = 0; c < 3; c++)
 			stateVector[i++] = this->orientation.ele[r][c];
 
-	stateVector[i++] = this->netForce.x;
-	stateVector[i++] = this->netForce.y;
-	stateVector[i++] = this->netForce.z;
+	stateVector[i++] = this->linearMomentum.x;
+	stateVector[i++] = this->linearMomentum.y;
+	stateVector[i++] = this->linearMomentum.z;
 
-	stateVector[i++] = this->netTorque.x;
-	stateVector[i++] = this->netTorque.y;
-	stateVector[i++] = this->netTorque.z;
+	stateVector[i++] = this->angularMomentum.x;
+	stateVector[i++] = this->angularMomentum.y;
+	stateVector[i++] = this->angularMomentum.z;
 
 	return true;
 }
@@ -184,13 +184,13 @@ bool RigidBody::StateFromVectorN(const VectorN& stateVector)
 		for (int c = 0; c < 3; c++)
 			this->orientation.ele[r][c] = stateVector[i++];
 
-	this->netForce.x = stateVector[i++];
-	this->netForce.y = stateVector[i++];
-	this->netForce.z = stateVector[i++];
+	this->linearMomentum.x = stateVector[i++];
+	this->linearMomentum.y = stateVector[i++];
+	this->linearMomentum.z = stateVector[i++];
 
-	this->netTorque.x = stateVector[i++];
-	this->netTorque.y = stateVector[i++];
-	this->netTorque.z = stateVector[i++];
+	this->angularMomentum.x = stateVector[i++];
+	this->angularMomentum.y = stateVector[i++];
+	this->angularMomentum.z = stateVector[i++];
 
 	return true;
 }
