@@ -25,10 +25,13 @@ namespace PhysicsEngine
 			return physicsObject;
 		}
 
+		typedef std::map<std::string, PhysicsObject*> PhysicsObjectMap;
+
 		bool RemovePhysicsObject(const std::string& name);
 		void Clear();
 		void Tick();
-		void GetPhysicsObjectArray(std::vector<PhysicsObject*>& physicsObjectList);
+		const PhysicsObjectMap& GetPhysicsObjectMap() const { return *this->physicsObjectMap; }
+		PhysicsObjectMap& GetPhysicsObjectMap() { return *this->physicsObjectMap; }
 		PhysicsObject* FindPhysicsObject(const std::string& name);
 
 	private:
@@ -37,7 +40,6 @@ namespace PhysicsEngine
 		//       a spacial partitioning datastructure in order to facilitate
 		//       efficient collision detection.
 
-		typedef std::map<std::string, PhysicsObject*> PhysicsObjectMap;
 		PhysicsObjectMap* physicsObjectMap;
 
 		double currentTime;

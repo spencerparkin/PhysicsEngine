@@ -33,6 +33,8 @@ namespace PhysicsEngine
 		const Matrix3x3& GetOrientation() const { return this->orientation; }
 		void SetLocation(const Vector3& location) { this->position = location; }
 		void SetOrientation(const Matrix3x3& orientation) { this->orientation = orientation; }
+		double GetMass() const { return this->mass; }
+		void AccumulateForce(const Vector3& force) { this->netForce += force; }
 
 		virtual void PrepareForTick(Simulation* sim) override;
 		virtual void Integrate(Simulation* sim, double deltaTime) override;

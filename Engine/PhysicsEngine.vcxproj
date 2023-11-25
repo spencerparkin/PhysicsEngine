@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Source\AxisAlignedBoundingBox.h" />
     <ClInclude Include="Source\Common.h" />
+    <ClInclude Include="Source\Gravity.h" />
     <ClInclude Include="Source\Matrix3x3.h" />
     <ClInclude Include="Source\NumericalIntegrator.hpp" />
     <ClInclude Include="Source\PhysicsObject.h" />
@@ -34,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp" />
+    <ClCompile Include="Source\Gravity.cpp" />
     <ClCompile Include="Source\Matrix3x3.cpp" />
     <ClCompile Include="Source\PhysicsObject.cpp" />
     <ClCompile Include="Source\Plane.cpp" />

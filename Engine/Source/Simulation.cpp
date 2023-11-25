@@ -67,13 +67,6 @@ void Simulation::Tick()
 	// TODO: Resolve constraints?
 }
 
-void Simulation::GetPhysicsObjectArray(std::vector<PhysicsObject*>& physicsObjectList)
-{
-	physicsObjectList.clear();
-	for (auto pair : *this->physicsObjectMap)
-		physicsObjectList.push_back(pair.second);
-}
-
 PhysicsObject* Simulation::FindPhysicsObject(const std::string& name)
 {
 	PhysicsObjectMap::iterator iter = this->physicsObjectMap->find(name);

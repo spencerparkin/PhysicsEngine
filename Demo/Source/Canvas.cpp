@@ -3,6 +3,7 @@
 #include "Simulation.h"
 #include "RenderObject.h"
 #include "PhysicsObject.h"
+#include "Gravity.h"
 #include <gl/GLU.h>
 
 using namespace PhysicsEngine;
@@ -18,6 +19,7 @@ Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList)
 	this->Bind(wxEVT_PAINT, &Canvas::OnPaint, this);
 	this->Bind(wxEVT_SIZE, &Canvas::OnSize, this);
 	this->Bind(wxEVT_KEY_DOWN, &Canvas::OnKeyDown, this);
+	this->Bind(wxEVT_KEY_UP, &Canvas::OnKeyUp, this);
 }
 
 /*virtual*/ Canvas::~Canvas()
@@ -54,6 +56,7 @@ void Canvas::OnPaint(wxPaintEvent& event)
 		0.0);
 
 	glLineWidth(1.5f);
+	glDisable(GL_LIGHTING);
 	glBegin(GL_LINES);
 
 	glDisable(GL_LIGHTING);
@@ -85,10 +88,10 @@ void Canvas::OnPaint(wxPaintEvent& event)
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpec);
 
-	std::vector<PhysicsObject*> physicsObjectArray;
-	wxGetApp().simulation.GetPhysicsObjectArray(physicsObjectArray);
-	for (const PhysicsObject* physicsObject : physicsObjectArray)
+	Simulation::PhysicsObjectMap& map = wxGetApp().simulation.GetPhysicsObjectMap();
+	for(auto pair : map)
 	{
+		const PhysicsObject* physicsObject = pair.second;
 		const RenderObject* renderObject = dynamic_cast<const RenderObject*>(physicsObject);
 		if (renderObject)
 			renderObject->Render();
@@ -111,6 +114,22 @@ void Canvas::OnSize(wxSizeEvent& event)
 
 void Canvas::OnKeyDown(wxKeyEvent& event)
 {
+}
+
+void Canvas::OnKeyUp(wxKeyEvent& event)
+{
+	switch (event.GetKeyCode())
+	{
+		case 'g':
+		case 'G':
+		{
+			if (wxGetApp().simulation.FindPhysicsObject("gravity"))
+				wxGetApp().simulation.RemovePhysicsObject("gravity");
+			else
+				wxGetApp().simulation.AddPhysicsObject<Gravity>("gravity");
+			break;
+		}
+	}
 }
 
 void Canvas::BindContext()
