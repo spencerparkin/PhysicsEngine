@@ -13,12 +13,18 @@
     <ClInclude Include="Source\Frame.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Canvas.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Frame.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Canvas.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

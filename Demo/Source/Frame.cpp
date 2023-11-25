@@ -1,6 +1,8 @@
 #include "Frame.h"
+#include "Canvas.h"
 #include <wx/menu.h>
 #include <wx/aboutdlg.h>
+#include <wx/sizer.h>
 
 Frame::Frame(const wxPoint& pos, const wxSize& size) : wxFrame(nullptr, wxID_ANY, "Physics Engine Demo", pos, size)
 {
@@ -19,6 +21,12 @@ Frame::Frame(const wxPoint& pos, const wxSize& size) : wxFrame(nullptr, wxID_ANY
 	this->Bind(wxEVT_MENU, &Frame::OnAbout, this, ID_About);
 
 	this->SetStatusBar(new wxStatusBar(this));
+
+	this->canvas = new Canvas(this);
+
+	wxBoxSizer* boxSizer = new wxBoxSizer(wxVERTICAL);
+	boxSizer->Add(this->canvas, 1, wxALL | wxGROW, 0);
+	this->SetSizer(boxSizer);
 }
 
 /*virtual*/ Frame::~Frame()
@@ -36,7 +44,7 @@ void Frame::OnAbout(wxCommandEvent& event)
 
 	aboutDialogInfo.SetName("Physics Engine Demo");
 	aboutDialogInfo.SetVersion("1.0");
-	aboutDialogInfo.SetDescription("This is mainly testing ground for the physics engine library.");
+	aboutDialogInfo.SetDescription("This is mainly a testing ground for the physics engine library.");
 	aboutDialogInfo.SetCopyright("Copyright (C) 2023 -- Spencer T. Parkin <SpencerTParkin@gmail.com>");
 
 	wxAboutBox(aboutDialogInfo);

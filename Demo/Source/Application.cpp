@@ -17,7 +17,7 @@ Application::Application()
 	if (!wxApp::OnInit())
 		return false;
 
-	this->frame = new Frame(wxDefaultPosition, wxDefaultSize);
+	this->frame = new Frame(wxDefaultPosition, wxSize(1200, 800));
 	this->frame->Show(true);
 
 	return true;

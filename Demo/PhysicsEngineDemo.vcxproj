@@ -20,10 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\Canvas.h" />
     <ClInclude Include="Source\Frame.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Canvas.cpp" />
     <ClCompile Include="Source\Frame.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

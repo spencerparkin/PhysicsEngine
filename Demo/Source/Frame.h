@@ -2,6 +2,8 @@
 
 #include <wx/frame.h>
 
+class Canvas;
+
 class Frame : public wxFrame
 {
 public:
@@ -16,4 +18,6 @@ public:
 		ID_Exit = wxID_HIGHEST,
 		ID_About
 	};
+
+	Canvas* canvas;
 };
