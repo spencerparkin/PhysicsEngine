@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Frame.h"
 #include "RigidBody.h"
+#include <wx/msgdlg.h>
 
 wxIMPLEMENT_APP(Application);
 
@@ -31,7 +32,11 @@ Application::Application()
 	pointArray.push_back(Vector3(-3.0, 3.0, 3.0));
 
 	auto rigidBody = this->simulation.AddPhysicsObject<RigidBody>();
-	rigidBody->MakeShape(pointArray, 0.2, [](const Vector3& point) -> double { return 1.0; });
+	if (!rigidBody->MakeShape(pointArray, 0.2, [](const Vector3& point) -> double { return 1.0; }))
+	{
+		wxMessageBox("Failed to create rigid body shape!", "Error", wxOK | wxICON_ERROR, nullptr);
+		return false;
+	}
 
 	this->frame = new Frame(wxDefaultPosition, wxSize(1200, 800));
 	this->frame->Show(true);

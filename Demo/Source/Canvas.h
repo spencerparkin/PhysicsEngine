@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wx/glcanvas.h>
+#include "Vector3.h"
 
 class Canvas : public wxGLCanvas
 {
@@ -17,4 +18,6 @@ private:
 
 	wxGLContext* context;
 	static int attributeList[];
+	PhysicsEngine::Vector3 cameraEye;
+	PhysicsEngine::Vector3 cameraSubject;
 };
