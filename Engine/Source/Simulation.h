@@ -22,6 +22,8 @@ namespace PhysicsEngine
 
 		void Clear();
 		void Tick(double deltaTime);
+		int GetNumPhysicsObjects();
+		PhysicsObject* GetPhysicsObject(int i);
 
 	private:
 

@@ -20,13 +20,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\Box.h" />
     <ClInclude Include="Source\Canvas.h" />
     <ClInclude Include="Source\Frame.h" />
+    <ClInclude Include="Source\RenderObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Box.cpp" />
     <ClCompile Include="Source\Canvas.cpp" />
     <ClCompile Include="Source\Frame.cpp" />
+    <ClCompile Include="Source\RenderObject.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

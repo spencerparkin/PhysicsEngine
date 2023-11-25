@@ -16,6 +16,12 @@
     <ClInclude Include="Source\Canvas.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Box.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RenderObject.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp">
@@ -25,6 +31,12 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Canvas.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RenderObject.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Box.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

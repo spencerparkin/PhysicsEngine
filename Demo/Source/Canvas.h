@@ -2,6 +2,7 @@
 
 #include <wx/glcanvas.h>
 #include "Vector3.h"
+#include "PolygonMesh.h"
 
 class Canvas : public wxGLCanvas
 {

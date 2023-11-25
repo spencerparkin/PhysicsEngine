@@ -10,6 +10,11 @@ PhysicsObject::PhysicsObject()
 {
 }
 
+/*virtual*/ void PhysicsObject::DeleteSelf()
+{
+	delete this;
+}
+
 /*virtual*/ void PhysicsObject::PrepareForTick()
 {
 }

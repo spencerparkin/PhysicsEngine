@@ -27,6 +27,8 @@ namespace PhysicsEngine
 		// It will be translated such that its center of mass is at the origin.
 		bool MakeShape(const std::vector<Vector3>& pointArray, double deltaLength, DensityFunc densityFunc);
 
+		const PolygonMesh& GetMesh() const { return this->mesh; }
+
 		virtual void PrepareForTick() override;
 		virtual void Tick(double deltaTime) override;
 

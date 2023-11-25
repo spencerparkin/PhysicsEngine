@@ -11,6 +11,7 @@ namespace PhysicsEngine
 		PhysicsObject();
 		virtual ~PhysicsObject();
 
+		virtual void DeleteSelf();		// May need to override this so that object is freed in correct heap.
 		virtual void PrepareForTick();
 		virtual void Tick(double deltaTime);
 

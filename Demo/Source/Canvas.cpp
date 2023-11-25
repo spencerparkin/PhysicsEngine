@@ -1,4 +1,8 @@
 #include "Canvas.h"
+#include "Application.h"
+#include "Simulation.h"
+#include "RenderObject.h"
+#include "PhysicsObject.h"
 #include <gl/GLU.h>
 
 using namespace PhysicsEngine;
@@ -67,6 +71,15 @@ void Canvas::OnPaint(wxPaintEvent& event)
 	glVertex3d(0.0, 0.0, 1.0);
 
 	glEnd();
+
+	int numObjects = wxGetApp().simulation.GetNumPhysicsObjects();
+	for (int i = 0; i < numObjects; i++)
+	{
+		const PhysicsObject* physicsObject = wxGetApp().simulation.GetPhysicsObject(i);
+		const RenderObject* renderObject = dynamic_cast<const RenderObject*>(physicsObject);
+		if (renderObject)
+			renderObject->Render();
+	}
 
 	glFlush();
 

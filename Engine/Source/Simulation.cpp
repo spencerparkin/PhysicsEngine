@@ -18,7 +18,7 @@ Simulation::Simulation()
 void Simulation::Clear()
 {
 	for (PhysicsObject* physicsObject : *this->physicsObjectArray)
-		delete physicsObject;
+		physicsObject->DeleteSelf();
 
 	this->physicsObjectArray->clear();
 }
@@ -34,4 +34,17 @@ void Simulation::Tick(double deltaTime)
 		physicsObject->Tick(deltaTime);
 
 	// TODO: Resolve constraints?
+}
+
+int Simulation::GetNumPhysicsObjects()
+{
+	return (int)this->physicsObjectArray->size();
+}
+
+PhysicsObject* Simulation::GetPhysicsObject(int i)
+{
+	if (i < 0 || i >= (int)this->physicsObjectArray->size())
+		return nullptr;
+
+	return (*this->physicsObjectArray)[i];
 }
