@@ -88,13 +88,13 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	return true;
 }
 
-/*virtual*/ void RigidBody::PrepareForTick()
+/*virtual*/ void RigidBody::PrepareForTick(Simulation* sim)
 {
 	this->netForce = Vector3(0.0, 0.0, 0.0);
 	this->netTorque = Vector3(0.0, 0.0, 0.0);
 }
 
-/*virtual*/ void RigidBody::Tick(double deltaTime)
+/*virtual*/ void RigidBody::Integrate(Simulation* sim, double deltaTime)
 {
 	EulerIntegrator<VectorN> integrator(deltaTime / 4.0);
 

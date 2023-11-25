@@ -5,7 +5,7 @@ using namespace PhysicsEngine;
 
 Simulation::Simulation()
 {
-	this->physicsObjectArray = new std::vector<PhysicsObject*>();
+	this->physicsObjectMap = new PhysicsObjectMap();
 	this->currentTime = 0.0;
 	this->maxDeltaTime = 0.5;
 }
@@ -14,15 +14,26 @@ Simulation::Simulation()
 {
 	this->Clear();
 
-	delete this->physicsObjectArray;
+	delete this->physicsObjectMap;
 }
 
 void Simulation::Clear()
 {
-	for (PhysicsObject* physicsObject : *this->physicsObjectArray)
-		physicsObject->DeleteSelf();
+	for (auto pair : *this->physicsObjectMap)
+		pair.second->DeleteSelf();
 
-	this->physicsObjectArray->clear();
+	this->physicsObjectMap->clear();
+}
+
+bool Simulation::RemovePhysicsObject(const std::string& name)
+{
+	PhysicsObjectMap::iterator iter = this->physicsObjectMap->find(name);
+	if (iter == this->physicsObjectMap->end())
+		return false;
+
+	iter->second->DeleteSelf();
+	this->physicsObjectMap->erase(iter);
+	return true;
 }
 
 void Simulation::Tick()
@@ -44,26 +55,30 @@ void Simulation::Tick()
 		return;
 	}
 
-	for (PhysicsObject* physicsObject : *this->physicsObjectArray)
-		physicsObject->PrepareForTick();
+	for (auto pair : *this->physicsObjectMap)
+		pair.second->PrepareForTick(this);
 
-	// TODO: Accumulate forces and torque.
+	for (auto pair : *this->physicsObjectMap)
+		pair.second->ApplyForces(this);
 
-	for (PhysicsObject* physicsObject : *this->physicsObjectArray)
-		physicsObject->Tick(deltaTime);
+	for (auto pair : *this->physicsObjectMap)
+		pair.second->Integrate(this, deltaTime);
 
 	// TODO: Resolve constraints?
 }
 
-int Simulation::GetNumPhysicsObjects()
+void Simulation::GetPhysicsObjectArray(std::vector<PhysicsObject*>& physicsObjectList)
 {
-	return (int)this->physicsObjectArray->size();
+	physicsObjectList.clear();
+	for (auto pair : *this->physicsObjectMap)
+		physicsObjectList.push_back(pair.second);
 }
 
-PhysicsObject* Simulation::GetPhysicsObject(int i)
+PhysicsObject* Simulation::FindPhysicsObject(const std::string& name)
 {
-	if (i < 0 || i >= (int)this->physicsObjectArray->size())
+	PhysicsObjectMap::iterator iter = this->physicsObjectMap->find(name);
+	if (iter == this->physicsObjectMap->end())
 		return nullptr;
 
-	return (*this->physicsObjectArray)[i];
+	return iter->second;
 }

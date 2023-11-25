@@ -13,24 +13,32 @@ namespace PhysicsEngine
 		virtual ~Simulation();
 
 		template<typename T>
-		T* AddPhysicsObject()
+		T* AddPhysicsObject(const std::string& name)
 		{
+			PhysicsObject* existingPhysicsObject = this->FindPhysicsObject(name);
+			if (existingPhysicsObject)
+				return nullptr;
+
 			T* physicsObject = T::Create();
-			this->physicsObjectArray->push_back(physicsObject);
+			*physicsObject->name = name;
+			this->physicsObjectMap->insert(std::pair<std::string, PhysicsObject*>(name, physicsObject));
 			return physicsObject;
 		}
 
+		bool RemovePhysicsObject(const std::string& name);
 		void Clear();
 		void Tick();
-		int GetNumPhysicsObjects();
-		PhysicsObject* GetPhysicsObject(int i);
+		void GetPhysicsObjectArray(std::vector<PhysicsObject*>& physicsObjectList);
+		PhysicsObject* FindPhysicsObject(const std::string& name);
 
 	private:
 
-		// TODO: At some point we may need to put everything into a
-		//       spacial partitioning data-structure, but this is fine
-		//       for now.
-		std::vector<PhysicsObject*>* physicsObjectArray;
+		// TODO: At some point we need to index all physics objects using
+		//       a spacial partitioning datastructure in order to facilitate
+		//       efficient collision detection.
+
+		typedef std::map<std::string, PhysicsObject*> PhysicsObjectMap;
+		PhysicsObjectMap* physicsObjectMap;
 
 		double currentTime;
 		double maxDeltaTime;

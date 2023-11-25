@@ -21,7 +21,7 @@ Application::Application()
 	if (!wxApp::OnInit())
 		return false;
 
-	auto box = this->simulation.AddPhysicsObject<Box>();
+	auto box = this->simulation.AddPhysicsObject<Box>("boxA");
 	if (!box->Setup(Vector3(3.0, 3.0, 3.0), Vector3(0.0, 0.0, 0.0)))
 	{
 		wxMessageBox("Failed to setup box!", "Error", wxOK | wxICON_ERROR, nullptr);

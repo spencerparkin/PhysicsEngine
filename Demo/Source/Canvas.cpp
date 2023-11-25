@@ -85,10 +85,10 @@ void Canvas::OnPaint(wxPaintEvent& event)
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpec);
 
-	int numObjects = wxGetApp().simulation.GetNumPhysicsObjects();
-	for (int i = 0; i < numObjects; i++)
+	std::vector<PhysicsObject*> physicsObjectArray;
+	wxGetApp().simulation.GetPhysicsObjectArray(physicsObjectArray);
+	for (const PhysicsObject* physicsObject : physicsObjectArray)
 	{
-		const PhysicsObject* physicsObject = wxGetApp().simulation.GetPhysicsObject(i);
 		const RenderObject* renderObject = dynamic_cast<const RenderObject*>(physicsObject);
 		if (renderObject)
 			renderObject->Render();

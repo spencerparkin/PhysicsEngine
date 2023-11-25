@@ -4,10 +4,12 @@ using namespace PhysicsEngine;
 
 PhysicsObject::PhysicsObject()
 {
+	this->name = new std::string();
 }
 
 /*virtual*/ PhysicsObject::~PhysicsObject()
 {
+	delete this->name;
 }
 
 /*virtual*/ void PhysicsObject::DeleteSelf()
@@ -15,10 +17,14 @@ PhysicsObject::PhysicsObject()
 	delete this;
 }
 
-/*virtual*/ void PhysicsObject::PrepareForTick()
+/*virtual*/ void PhysicsObject::PrepareForTick(Simulation* sim)
 {
 }
 
-/*virtual*/ void PhysicsObject::Tick(double deltaTime)
+/*virtual*/ void PhysicsObject::ApplyForces(Simulation* sim)
+{
+}
+
+/*virtual*/ void PhysicsObject::Integrate(Simulation* sim, double deltaTime)
 {
 }

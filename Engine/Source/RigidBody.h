@@ -34,8 +34,8 @@ namespace PhysicsEngine
 		void SetLocation(const Vector3& location) { this->position = location; }
 		void SetOrientation(const Matrix3x3& orientation) { this->orientation = orientation; }
 
-		virtual void PrepareForTick() override;
-		virtual void Tick(double deltaTime) override;
+		virtual void PrepareForTick(Simulation* sim) override;
+		virtual void Integrate(Simulation* sim, double deltaTime) override;
 
 	private:
 
