@@ -44,10 +44,11 @@ Box::Box()
 		int numVertices = polygon->GetNumVertices();
 		for (int j = 0; j < numVertices; j++)
 		{
-			const Vector3& vertex = polygon->GetVertex(j, mesh);
+			const Vector3& localVertex = polygon->GetVertex(j, mesh);
+			Vector3 worldVertex = orientation * localVertex + position;
 
 			glNormal3dv(&plane.normal.x);
-			glVertex3dv(&vertex.x);
+			glVertex3dv(&worldVertex.x);
 		}
 
 		glEnd();
