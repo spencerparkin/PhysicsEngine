@@ -21,10 +21,16 @@ Application::Application()
 	if (!wxApp::OnInit())
 		return false;
 
-	auto box = this->simulation.AddPhysicsObject<Box>("boxA");
-	if (!box->Setup(Vector3(3.0, 3.0, 3.0), Vector3(0.0, 0.0, 0.0)))
+	auto boxA = this->simulation.AddPhysicsObject<Box>("boxA");
+	if (!boxA->Setup(Vector3(1.0, 1.5, 2.0), Vector3(-3.0, 0.0, 0.0)))
 	{
-		wxMessageBox("Failed to setup box!", "Error", wxOK | wxICON_ERROR, nullptr);
+		wxMessageBox("Failed to setup box A!", "Error", wxOK | wxICON_ERROR, nullptr);
+	}
+
+	auto boxB = this->simulation.AddPhysicsObject<Box>("boxB");
+	if (!boxB->Setup(Vector3(0.5, 1.5, 1.8), Vector3(3.0, 0.0, 0.0)))
+	{
+		wxMessageBox("Failed to setup box B!", "Error", wxOK | wxICON_ERROR, nullptr);
 	}
 
 	this->frame = new Frame(wxDefaultPosition, wxSize(1200, 800));

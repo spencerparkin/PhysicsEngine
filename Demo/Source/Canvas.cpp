@@ -12,7 +12,7 @@ int Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 
 Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList)
 {
-	this->cameraEye = Vector3(0.0, 0.0, 20.0); //Vector3(20.0, 10.0, 20.0);
+	this->cameraEye = Vector3(0.0, 0.0, 10.0);
 	this->cameraSubject = Vector3(0.0, 0.0, 0.0);
 	this->lightPosition = Vector3(10.0, 20.0, 50.0);
 
@@ -137,26 +137,27 @@ void Canvas::HandleKeypresses()
 
 	Vector3 force(0.0, 0.0, 0.0);
 	Vector3 torque(0.0, 0.0, 0.0);
+	double strength = 50.0;
 
 	// Apply a force.
 	if (wxGetKeyState(wxKeyCode::WXK_LEFT))
-		force += viewFrame * Vector3(-500.0, 0.0, 0.0);		// -X
+		force += viewFrame * Vector3(-strength, 0.0, 0.0);		// -X
 	if (wxGetKeyState(wxKeyCode::WXK_RIGHT))
-		force += viewFrame * Vector3(500.0, 0.0, 0.0);		// +X
+		force += viewFrame * Vector3(strength, 0.0, 0.0);		// +X
 	if (wxGetKeyState(wxKeyCode::WXK_DOWN))
-		force += viewFrame * Vector3(0.0, -500.0, 0.0);		// -Y
+		force += viewFrame * Vector3(0.0, -strength, 0.0);		// -Y
 	if (wxGetKeyState(wxKeyCode::WXK_UP))
-		force += viewFrame * Vector3(0.0, 500.0, 0.0);		// +Y	
+		force += viewFrame * Vector3(0.0, strength, 0.0);		// +Y	
 
 	// Apply a torque.
 	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD2))
-		torque += viewFrame * Vector3(-300.0, 0.0, 0.0);	// -X
+		torque += viewFrame * Vector3(-strength, 0.0, 0.0);		// -X
 	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD8))
-		torque += viewFrame * Vector3(300.0, 0.0, 0.0);		// +X
+		torque += viewFrame * Vector3(strength, 0.0, 0.0);		// +X
 	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD6))
-		torque += viewFrame * Vector3(0.0, -300.0, 0.0);	// -Y
+		torque += viewFrame * Vector3(0.0, -strength, 0.0);		// -Y
 	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD4))
-		torque += viewFrame * Vector3(0.0, 300.0, 0.0);		// +Y
+		torque += viewFrame * Vector3(0.0, strength, 0.0);		// +Y
 
 	this->jediForce->SetForce(force);
 	this->jediTorque->SetTorque(torque);
@@ -177,6 +178,20 @@ void Canvas::OnKeyUp(wxKeyEvent& event)
 				wxGetApp().simulation.RemovePhysicsObject("gravity");
 			else
 				wxGetApp().simulation.AddPhysicsObject<Gravity>("gravity");
+			break;
+		}
+		case 'a':
+		case 'A':
+		{
+			this->jediForce->SetTarget("boxA");
+			this->jediTorque->SetTarget("boxA");
+			break;
+		}
+		case 'b':
+		case 'B':
+		{
+			this->jediForce->SetTarget("boxB");
+			this->jediTorque->SetTarget("boxB");
 			break;
 		}
 	}
