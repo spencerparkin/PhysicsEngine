@@ -204,3 +204,8 @@ bool RigidBody::StateFromVectorN(const VectorN& stateVector)
 {
 	this->netForce += force;
 }
+
+/*virtual*/ void RigidBody::AccumulateTorque(const Vector3& torque)
+{
+	this->netTorque += torque;
+}

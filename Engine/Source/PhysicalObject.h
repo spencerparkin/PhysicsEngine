@@ -14,6 +14,6 @@ namespace PhysicsEngine
 
 		virtual double GetMass() const = 0;
 		virtual void AccumulateForce(const Vector3& force) = 0;
-		//virtual void AccumulateTorque(const Vector3& torque) = 0;
+		virtual void AccumulateTorque(const Vector3& torque);
 	};
 }

@@ -23,6 +23,9 @@ Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList)
 
 	this->jediForce = wxGetApp().simulation.AddPhysicsObject<JediForce>("jedi_force");
 	this->jediForce->SetTarget("boxA");
+
+	this->jediTorque = wxGetApp().simulation.AddPhysicsObject<JediTorque>("jedi_torque");
+	this->jediTorque->SetTarget("boxA");
 }
 
 /*virtual*/ Canvas::~Canvas()
@@ -133,20 +136,30 @@ void Canvas::HandleKeypresses()
 	this->CalcViewFrame(viewFrame);
 
 	Vector3 force(0.0, 0.0, 0.0);
+	Vector3 torque(0.0, 0.0, 0.0);
 
+	// Apply a force.
 	if (wxGetKeyState(wxKeyCode::WXK_LEFT))
-		force += viewFrame * Vector3(-500.0, 0.0, 0.0);
-
+		force += viewFrame * Vector3(-500.0, 0.0, 0.0);		// -X
 	if (wxGetKeyState(wxKeyCode::WXK_RIGHT))
-		force += viewFrame * Vector3(500.0, 0.0, 0.0);
-
-	if (wxGetKeyState(wxKeyCode::WXK_UP))
-		force += viewFrame * Vector3(0.0, 500.0, 0.0);
-
+		force += viewFrame * Vector3(500.0, 0.0, 0.0);		// +X
 	if (wxGetKeyState(wxKeyCode::WXK_DOWN))
-		force += viewFrame * Vector3(0.0, -500.0, 0.0);
+		force += viewFrame * Vector3(0.0, -500.0, 0.0);		// -Y
+	if (wxGetKeyState(wxKeyCode::WXK_UP))
+		force += viewFrame * Vector3(0.0, 500.0, 0.0);		// +Y	
+
+	// Apply a torque.
+	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD8))
+		torque += viewFrame * Vector3(-300.0, 0.0, 0.0);	// -X
+	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD2))
+		torque += viewFrame * Vector3(300.0, 0.0, 0.0);		// +X
+	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD6))
+		torque += viewFrame * Vector3(0.0, -300.0, 0.0);	// -Y
+	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD4))
+		torque += viewFrame * Vector3(0.0, 300.0, 0.0);		// +Y
 
 	this->jediForce->SetForce(force);
+	this->jediTorque->SetTorque(torque);
 }
 
 void Canvas::OnKeyDown(wxKeyEvent& event)

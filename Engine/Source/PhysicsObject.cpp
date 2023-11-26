@@ -21,7 +21,7 @@ PhysicsObject::PhysicsObject()
 {
 }
 
-/*virtual*/ void PhysicsObject::ApplyForces(Simulation* sim)
+/*virtual*/ void PhysicsObject::ApplyForcesAndTorques(Simulation* sim)
 {
 }
 

@@ -59,7 +59,7 @@ void Simulation::Tick()
 		pair.second->PrepareForTick(this);
 
 	for (auto pair : *this->physicsObjectMap)
-		pair.second->ApplyForces(this);
+		pair.second->ApplyForcesAndTorques(this);
 
 	for (auto pair : *this->physicsObjectMap)
 		pair.second->Integrate(this, deltaTime);

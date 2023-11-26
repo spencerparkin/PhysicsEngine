@@ -198,8 +198,18 @@ void Matrix3x3::Transpose()
 
 bool Matrix3x3::Orthonormalize()
 {
-	// TODO: Write this.
-	return false;
+	Vector3 xAxis, yAxis, zAxis;
+	this->GetAxes(xAxis, yAxis, zAxis);
+	if (!xAxis.Normalize())
+		return false;
+
+	yAxis -= yAxis.InnerProduct(xAxis) * xAxis;
+	if (!yAxis.Normalize())
+		return false;
+
+	zAxis = xAxis.CrossProduct(yAxis);
+	this->SetAxes(xAxis, yAxis, zAxis);
+	return true;
 }
 
 Vector3 Matrix3x3::TransformPoint(const Vector3& point) const

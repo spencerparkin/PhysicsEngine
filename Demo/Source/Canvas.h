@@ -5,6 +5,7 @@
 #include "Matrix3x3.h"
 #include "PolygonMesh.h"
 #include "JediForce.h"
+#include "JediTorque.h"
 
 class Canvas : public wxGLCanvas
 {
@@ -29,4 +30,5 @@ private:
 	PhysicsEngine::Vector3 cameraSubject;
 	PhysicsEngine::Vector3 lightPosition;
 	PhysicsEngine::JediForce* jediForce;
+	PhysicsEngine::JediTorque* jediTorque;
 };

@@ -5,24 +5,24 @@
 
 namespace PhysicsEngine
 {
-	class PHYSICS_ENGINE_API JediForce : public PhysicsObject
+	class PHYSICS_ENGINE_API JediTorque : public PhysicsObject
 	{
 	public:
-		JediForce();
-		virtual ~JediForce();
+		JediTorque();
+		virtual ~JediTorque();
 
-		static JediForce* Create();
+		static JediTorque* Create();
 
 		virtual void ApplyForcesAndTorques(Simulation* sim) override;
 
-		void SetForce(const Vector3& force) { this->force = force; }
-		const Vector3& GetForce() const { return this->force; }
+		void SetTorque(const Vector3& torque) { this->torque = torque; }
+		const Vector3& GetTorque() const { return this->torque; }
 
 		void SetTarget(const std::string& target) { *this->target = target; }
 		const std::string& GetTarget() const { return *this->target; }
 
 	private:
-		Vector3 force;
+		Vector3 torque;
 		std::string* target;
 	};
 }

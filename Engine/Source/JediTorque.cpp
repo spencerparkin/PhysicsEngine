@@ -1,26 +1,26 @@
-#include "JediForce.h"
+#include "JediTorque.h"
 #include "Simulation.h"
 #include "PhysicalObject.h"
 
 using namespace PhysicsEngine;
 
-JediForce::JediForce()
+JediTorque::JediTorque()
 {
 	this->target = new std::string();
-	this->force = Vector3(0.0, 0.0, 0.0);
+	this->torque = Vector3(0.0, 0.0, 0.0);
 }
 
-/*virtual*/ JediForce::~JediForce()
+/*virtual*/ JediTorque::~JediTorque()
 {
 	delete this->target;
 }
 
-/*static*/ JediForce* JediForce::Create()
+/*static*/ JediTorque* JediTorque::Create()
 {
-	return new JediForce();
+	return new JediTorque();
 }
 
-/*virtual*/ void JediForce::ApplyForcesAndTorques(Simulation* sim)
+/*virtual*/ void JediTorque::ApplyForcesAndTorques(Simulation* sim)
 {
 	PhysicsObject* physicsObject = sim->FindPhysicsObject(*this->target);
 	if (physicsObject)
@@ -28,7 +28,7 @@ JediForce::JediForce()
 		PhysicalObject* physicalObject = dynamic_cast<PhysicalObject*>(physicsObject);
 		if (physicalObject)
 		{
-			physicalObject->AccumulateForce(this->force);
+			physicalObject->AccumulateTorque(this->torque);
 		}
 	}
 }

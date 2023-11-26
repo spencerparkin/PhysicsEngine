@@ -13,7 +13,7 @@ namespace PhysicsEngine
 
 		static Gravity* Create();
 
-		virtual void ApplyForces(Simulation* sim) override;
+		virtual void ApplyForcesAndTorques(Simulation* sim) override;
 
 		void SetDirection(const Vector3& direction) { this->direction = direction; }
 		const Vector3& GetDirection() const { return this->direction; }

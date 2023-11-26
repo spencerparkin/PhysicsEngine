@@ -38,6 +38,7 @@ namespace PhysicsEngine
 		virtual void Integrate(Simulation* sim, double deltaTime) override;
 		virtual double GetMass() const override;
 		virtual void AccumulateForce(const Vector3& force) override;
+		virtual void AccumulateTorque(const Vector3& torque) override;
 
 	private:
 
