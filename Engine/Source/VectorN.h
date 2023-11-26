@@ -9,6 +9,7 @@ namespace PhysicsEngine
 	public:
 		VectorN();
 		VectorN(const VectorN& vector);
+		VectorN(int dimension);
 		virtual ~VectorN();
 
 		void SetDimension(int dimension);

@@ -94,65 +94,40 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	this->netTorque = Vector3(0.0, 0.0, 0.0);
 }
 
-/*virtual*/ void RigidBody::Integrate(Simulation* sim, double deltaTime)
+/*virtual*/ int RigidBody::GetStateSpaceRequirement() const
 {
-	EulerIntegrator<VectorN> integrator(deltaTime / 4.0);
-
-	VectorN currentState;
-	this->StateToVectorN(currentState);
-
-	VectorN newState;
-	integrator.Integrate(currentState, newState, 0.0, deltaTime, [this](const VectorN& currentState, double currentTime, VectorN& currentStateDerivative) {
-		this->StateFromVectorN(currentState);
-
-		currentStateDerivative.SetDimension(currentState.GetDimension());
-
-		int i = 0;
-
-		Vector3 velocity = this->linearMomentum / this->mass;
-
-		currentStateDerivative[i++] = velocity.x;
-		currentStateDerivative[i++] = velocity.y;
-		currentStateDerivative[i++] = velocity.z;
-
-		this->orientation.Orthonormalize();
-
-		Matrix3x3 orientationInv(this->orientation);
-		orientationInv.Transpose();
-
-		Matrix3x3 inertiaTensorInv = this->orientation * this->bodySpaceInertiaTensorInv * orientationInv;
-
-		Vector3 angularVelocity = inertiaTensorInv * this->angularMomentum;
-		Matrix3x3 angularVelocityMatrix;
-		angularVelocityMatrix.SetForCrossProduct(angularVelocity);
-
-		Matrix3x3 orientationDerivative = angularVelocityMatrix * this->orientation;
-
-		for (int r = 0; r < 3; r++)
-			for (int c = 0; c < 3; c++)
-				currentStateDerivative[i++] = orientationDerivative.ele[r][c];
-
-		currentStateDerivative[i++] = this->netForce.x;
-		currentStateDerivative[i++] = this->netForce.y;
-		currentStateDerivative[i++] = this->netForce.z;
-
-		currentStateDerivative[i++] = this->netTorque.x;
-		currentStateDerivative[i++] = this->netTorque.y;
-		currentStateDerivative[i++] = this->netTorque.z;
-	});
-
-	this->StateFromVectorN(newState);
+	// 3 for position, 9 for orientation, 3 for linear momentum, and 3 for angular momentum.
+	return 18;
 }
 
-bool RigidBody::StateToVectorN(VectorN& stateVector) const
+/*virtual*/ void RigidBody::SetStateFromVector(const VectorN& stateVector, int& i)
 {
-	stateVector.SetDimension(18);
+	this->position.x = stateVector[i++];
+	this->position.y = stateVector[i++];
+	this->position.z = stateVector[i++];
 
-	int i = 0;
+	for (int r = 0; r < 3; r++)
+		for (int c = 0; c < 3; c++)
+			this->orientation.ele[r][c] = stateVector[i++];
 
+	this->orientation.Orthonormalize();
+
+	this->linearMomentum.x = stateVector[i++];
+	this->linearMomentum.y = stateVector[i++];
+	this->linearMomentum.z = stateVector[i++];
+
+	this->angularMomentum.x = stateVector[i++];
+	this->angularMomentum.y = stateVector[i++];
+	this->angularMomentum.z = stateVector[i++];
+}
+
+/*virtual*/ void RigidBody::GetStateToVector(VectorN& stateVector, int& i) const
+{
 	stateVector[i++] = this->position.x;
 	stateVector[i++] = this->position.y;
 	stateVector[i++] = this->position.z;
+
+	const_cast<RigidBody*>(this)->orientation.Orthonormalize();
 
 	for (int r = 0; r < 3; r++)
 		for (int c = 0; c < 3; c++)
@@ -165,34 +140,40 @@ bool RigidBody::StateToVectorN(VectorN& stateVector) const
 	stateVector[i++] = this->angularMomentum.x;
 	stateVector[i++] = this->angularMomentum.y;
 	stateVector[i++] = this->angularMomentum.z;
-
-	return true;
 }
 
-bool RigidBody::StateFromVectorN(const VectorN& stateVector)
+/*virtual*/ void RigidBody::CalcStateDerivatives(VectorN& stateDerivativeVector, int& i)
 {
-	if (stateVector.GetDimension() != 18)
-		return false;
+	Vector3 velocity = this->linearMomentum / this->mass;
 
-	int i = 0;
+	stateDerivativeVector[i++] = velocity.x;
+	stateDerivativeVector[i++] = velocity.y;
+	stateDerivativeVector[i++] = velocity.z;
 
-	this->position.x = stateVector[i++];
-	this->position.y = stateVector[i++];
-	this->position.z = stateVector[i++];
+	this->orientation.Orthonormalize();
+
+	Matrix3x3 orientationInv(this->orientation);
+	orientationInv.Transpose();
+
+	Matrix3x3 inertiaTensorInv = this->orientation * this->bodySpaceInertiaTensorInv * orientationInv;
+
+	Vector3 angularVelocity = inertiaTensorInv * this->angularMomentum;
+	Matrix3x3 angularVelocityMatrix;
+	angularVelocityMatrix.SetForCrossProduct(angularVelocity);
+
+	Matrix3x3 orientationDerivative = angularVelocityMatrix * this->orientation;
 
 	for (int r = 0; r < 3; r++)
 		for (int c = 0; c < 3; c++)
-			this->orientation.ele[r][c] = stateVector[i++];
+			stateDerivativeVector[i++] = orientationDerivative.ele[r][c];
 
-	this->linearMomentum.x = stateVector[i++];
-	this->linearMomentum.y = stateVector[i++];
-	this->linearMomentum.z = stateVector[i++];
+	stateDerivativeVector[i++] = this->netForce.x;
+	stateDerivativeVector[i++] = this->netForce.y;
+	stateDerivativeVector[i++] = this->netForce.z;
 
-	this->angularMomentum.x = stateVector[i++];
-	this->angularMomentum.y = stateVector[i++];
-	this->angularMomentum.z = stateVector[i++];
-
-	return true;
+	stateDerivativeVector[i++] = this->netTorque.x;
+	stateDerivativeVector[i++] = this->netTorque.y;
+	stateDerivativeVector[i++] = this->netTorque.z;
 }
 
 /*virtual*/ double RigidBody::GetMass() const

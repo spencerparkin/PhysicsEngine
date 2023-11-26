@@ -13,6 +13,12 @@ VectorN::VectorN(const VectorN& vector)
 	*this = vector;
 }
 
+VectorN::VectorN(int dimension)
+{
+	this->scalarArray = new std::vector<double>();
+	this->SetDimension(dimension);
+}
+
 /*virtual*/ VectorN::~VectorN()
 {
 	delete this->scalarArray;
@@ -81,7 +87,6 @@ double VectorN::operator[](int i) const
 
 double& VectorN::operator[](int i)
 {
-	i = PHY_ENG_MAX(0, PHY_ENG_MIN((int)this->scalarArray->size() - 1, i));
 	return (*this->scalarArray)[i];
 }
 

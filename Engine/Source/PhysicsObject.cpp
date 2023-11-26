@@ -24,7 +24,3 @@ PhysicsObject::PhysicsObject()
 /*virtual*/ void PhysicsObject::ApplyForcesAndTorques(Simulation* sim)
 {
 }
-
-/*virtual*/ void PhysicsObject::Integrate(Simulation* sim, double deltaTime)
-{
-}

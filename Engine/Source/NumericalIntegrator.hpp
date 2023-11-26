@@ -53,6 +53,8 @@ namespace PhysicsEngine
 				currentState += currentStateDerivative * deltaTime;
 				currentTime += deltaTime;
 			}
+
+			finalState = currentState;
 		}
 
 	private:
