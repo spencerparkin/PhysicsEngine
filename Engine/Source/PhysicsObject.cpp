@@ -16,11 +16,3 @@ PhysicsObject::PhysicsObject()
 {
 	delete this;
 }
-
-/*virtual*/ void PhysicsObject::PrepareForTick(Simulation* sim)
-{
-}
-
-/*virtual*/ void PhysicsObject::ApplyForcesAndTorques(Simulation* sim)
-{
-}

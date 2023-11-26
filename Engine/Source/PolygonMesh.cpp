@@ -242,6 +242,9 @@ void PolygonMesh::Translate(const Vector3& translationDelta)
 {
 	for (Vector3& vertex : *this->vertexArray)
 		vertex += translationDelta;
+
+	for (Polygon* polygon : *this->polygonArray)
+		polygon->InvalidateCachedPlane();
 }
 
 int PolygonMesh::GetNumPolygons() const
@@ -262,11 +265,13 @@ const PolygonMesh::Polygon* PolygonMesh::GetPolygon(int i) const
 PolygonMesh::Polygon::Polygon()
 {
 	this->vertexArray = new std::vector<int>();
+	this->cachedPlane = nullptr;
 }
 
 /*virtual*/ PolygonMesh::Polygon::~Polygon()
 {
 	delete this->vertexArray;
+	delete this->cachedPlane;
 }
 
 void PolygonMesh::Polygon::Clear()
@@ -396,8 +401,22 @@ bool PolygonMesh::Polygon::IsCoplanar(const std::vector<Vector3>& pointArray) co
 	return this->AllPointsOnPlane(plane, pointArray);
 }
 
+void PolygonMesh::Polygon::InvalidateCachedPlane() const
+{
+	delete this->cachedPlane;
+	this->cachedPlane = nullptr;
+}
+
 bool PolygonMesh::Polygon::MakePlane(Plane& plane, const std::vector<Vector3>& pointArray) const
 {
+	if (this->cachedPlane)
+	{
+		plane = *this->cachedPlane;
+		return true;
+	}
+
+	this->cachedPlane = new Plane();
+
 	double largestArea = 0.0;
 	Triangle bestTriangle{ -1, -1, -1 };
 
@@ -425,6 +444,7 @@ bool PolygonMesh::Polygon::MakePlane(Plane& plane, const std::vector<Vector3>& p
 		return false;
 
 	bestTriangle.MakePlane(plane, pointArray);
+	*this->cachedPlane = plane;
 	return true;
 }
 

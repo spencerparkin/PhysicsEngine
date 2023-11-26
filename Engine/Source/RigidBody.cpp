@@ -88,7 +88,7 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	return true;
 }
 
-/*virtual*/ void RigidBody::PrepareForTick(Simulation* sim)
+/*virtual*/ void RigidBody::ZeroNetForcesAndTorques()
 {
 	this->netForce = Vector3(0.0, 0.0, 0.0);
 	this->netTorque = Vector3(0.0, 0.0, 0.0);
@@ -142,15 +142,15 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	stateVector[i++] = this->angularMomentum.z;
 }
 
-/*virtual*/ void RigidBody::CalcStateDerivatives(VectorN& stateDerivativeVector, int& i)
+/*virtual*/ void RigidBody::CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const
 {
 	Vector3 velocity = this->linearMomentum / this->mass;
 
-	stateDerivativeVector[i++] = velocity.x;
-	stateDerivativeVector[i++] = velocity.y;
-	stateDerivativeVector[i++] = velocity.z;
+	stateVectorDerivative[i++] = velocity.x;
+	stateVectorDerivative[i++] = velocity.y;
+	stateVectorDerivative[i++] = velocity.z;
 
-	this->orientation.Orthonormalize();
+	const_cast<RigidBody*>(this)->orientation.Orthonormalize();
 
 	Matrix3x3 orientationInv(this->orientation);
 	orientationInv.Transpose();
@@ -165,15 +165,15 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 
 	for (int r = 0; r < 3; r++)
 		for (int c = 0; c < 3; c++)
-			stateDerivativeVector[i++] = orientationDerivative.ele[r][c];
+			stateVectorDerivative[i++] = orientationDerivative.ele[r][c];
 
-	stateDerivativeVector[i++] = this->netForce.x;
-	stateDerivativeVector[i++] = this->netForce.y;
-	stateDerivativeVector[i++] = this->netForce.z;
+	stateVectorDerivative[i++] = this->netForce.x;
+	stateVectorDerivative[i++] = this->netForce.y;
+	stateVectorDerivative[i++] = this->netForce.z;
 
-	stateDerivativeVector[i++] = this->netTorque.x;
-	stateDerivativeVector[i++] = this->netTorque.y;
-	stateDerivativeVector[i++] = this->netTorque.z;
+	stateVectorDerivative[i++] = this->netTorque.x;
+	stateVectorDerivative[i++] = this->netTorque.y;
+	stateVectorDerivative[i++] = this->netTorque.z;
 }
 
 /*virtual*/ double RigidBody::GetMass() const

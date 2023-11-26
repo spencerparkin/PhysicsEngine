@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Source\AxisAlignedBoundingBox.h" />
     <ClInclude Include="Source\Common.h" />
+    <ClInclude Include="Source\ConceptObject.h" />
     <ClInclude Include="Source\Gravity.h" />
     <ClInclude Include="Source\JediForce.h" />
     <ClInclude Include="Source\JediTorque.h" />
@@ -38,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp" />
+    <ClCompile Include="Source\ConceptObject.cpp" />
     <ClCompile Include="Source\Gravity.cpp" />
     <ClCompile Include="Source\JediForce.cpp" />
     <ClCompile Include="Source\JediTorque.cpp" />

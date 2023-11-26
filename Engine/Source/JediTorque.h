@@ -1,11 +1,11 @@
 #pragma once
 
-#include "PhysicsObject.h"
+#include "ConceptObject.h"
 #include "Vector3.h"
 
 namespace PhysicsEngine
 {
-	class PHYSICS_ENGINE_API JediTorque : public PhysicsObject
+	class PHYSICS_ENGINE_API JediTorque : public ConceptObject
 	{
 	public:
 		JediTorque();
@@ -13,7 +13,7 @@ namespace PhysicsEngine
 
 		static JediTorque* Create();
 
-		virtual void ApplyForcesAndTorques(Simulation* sim) override;
+		virtual void ApplyForcesAndTorques(Simulation* sim, double currentTime) override;
 
 		void SetTorque(const Vector3& torque) { this->torque = torque; }
 		const Vector3& GetTorque() const { return this->torque; }

@@ -19,6 +19,7 @@ namespace PhysicsEngine
 		virtual int GetStateSpaceRequirement() const;
 		virtual void SetStateFromVector(const VectorN& stateVector, int& i);
 		virtual void GetStateToVector(VectorN& stateVector, int& i) const;
-		virtual void CalcStateDerivatives(VectorN& stateDerivativeVector, int& i);
+		virtual void CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const;
+		virtual void ZeroNetForcesAndTorques();
 	};
 }

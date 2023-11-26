@@ -1,11 +1,11 @@
 #pragma once
 
-#include "PhysicsObject.h"
+#include "ConceptObject.h"
 #include "Vector3.h"
 
 namespace PhysicsEngine
 {
-	class PHYSICS_ENGINE_API Gravity : public PhysicsObject
+	class PHYSICS_ENGINE_API Gravity : public ConceptObject
 	{
 	public:
 		Gravity();
@@ -13,7 +13,7 @@ namespace PhysicsEngine
 
 		static Gravity* Create();
 
-		virtual void ApplyForcesAndTorques(Simulation* sim) override;
+		virtual void ApplyForcesAndTorques(Simulation* sim, double currentTime) override;
 
 		void SetDirection(const Vector3& direction) { this->direction = direction; }
 		const Vector3& GetDirection() const { return this->direction; }

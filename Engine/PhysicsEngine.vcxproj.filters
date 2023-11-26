@@ -58,6 +58,9 @@
     <ClInclude Include="Source\JediTorque.h">
       <Filter>Source\PhysicsObjects</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ConceptObject.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp">
@@ -101,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="Source\JediTorque.cpp">
       <Filter>Source\PhysicsObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ConceptObject.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

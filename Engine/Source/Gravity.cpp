@@ -19,7 +19,7 @@ Gravity::Gravity()
 	return new Gravity();
 }
 
-/*virtual*/ void Gravity::ApplyForcesAndTorques(Simulation* sim)
+/*virtual*/ void Gravity::ApplyForcesAndTorques(Simulation* sim, double currentTime)
 {
 	// Gravity is just universally applied to all physical objects of the simulation.
 	Simulation::PhysicsObjectMap& physicsObjectMap = sim->GetPhysicsObjectMap();

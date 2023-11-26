@@ -27,6 +27,10 @@ PhysicalObject::PhysicalObject()
 {
 }
 
-/*virtual*/ void PhysicalObject::CalcStateDerivatives(VectorN& stateDerivativeVector, int& i)
+/*virtual*/ void PhysicalObject::CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const
+{
+}
+
+/*virtual*/ void PhysicalObject::ZeroNetForcesAndTorques()
 {
 }

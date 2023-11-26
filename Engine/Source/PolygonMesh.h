@@ -31,8 +31,10 @@ namespace PhysicsEngine
 			bool MakePlane(Plane& plane, const std::vector<Vector3>& pointArray) const;
 			int GetNumVertices() const;
 			const Vector3& GetVertex(int i, const PolygonMesh& polygonMesh) const;
+			void InvalidateCachedPlane() const;
 
 		private:
+			mutable Plane* cachedPlane;
 			std::vector<int>* vertexArray;
 		};
 

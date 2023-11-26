@@ -5,6 +5,9 @@
 namespace PhysicsEngine
 {
 	class PhysicsObject;
+	class PhysicalObject;
+	class ConceptObject;
+	class VectorN;
 
 	class PHYSICS_ENGINE_API Simulation
 	{
@@ -36,13 +39,23 @@ namespace PhysicsEngine
 
 	private:
 
+		void ToStateVector(VectorN& stateVector) const;
+		void FromStateVector(const VectorN& stateVector);
+		void ToStateVectorDerivative(VectorN& stateVectorDerivative);
+
+		bool InterpenetrationDetected() const;
+
 		// TODO: At some point we need to index all physics objects using
 		//       a spacial partitioning datastructure in order to facilitate
 		//       efficient collision detection.
 
 		PhysicsObjectMap* physicsObjectMap;
 
-		double currentTime;
-		double maxDeltaTime;
+		double currentTime;			// Each tick, we get our current time caught up with the present time.
+		double maxDeltaTime;		// A tick is aborted if the gap between the present time and the current time exceeds this.
+		double maxTimeStepSize;		// We catch up to the present time in increments of this size.
+
+		std::vector<PhysicalObject*>* physicalObjectArray;
+		std::vector<ConceptObject*>* conceptObjectArray;
 	};
 }

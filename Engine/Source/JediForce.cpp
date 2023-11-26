@@ -20,7 +20,7 @@ JediForce::JediForce()
 	return new JediForce();
 }
 
-/*virtual*/ void JediForce::ApplyForcesAndTorques(Simulation* sim)
+/*virtual*/ void JediForce::ApplyForcesAndTorques(Simulation* sim, double currentTime)
 {
 	PhysicsObject* physicsObject = sim->FindPhysicsObject(*this->target);
 	if (physicsObject)

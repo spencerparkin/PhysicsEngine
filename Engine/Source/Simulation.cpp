@@ -1,6 +1,7 @@
 #include "Simulation.h"
 #include "PhysicsObject.h"
 #include "PhysicalObject.h"
+#include "ConceptObject.h"
 #include "NumericalIntegrator.hpp"
 #include "VectorN.h"
 
@@ -9,8 +10,11 @@ using namespace PhysicsEngine;
 Simulation::Simulation()
 {
 	this->physicsObjectMap = new PhysicsObjectMap();
+	this->physicalObjectArray = new std::vector<PhysicalObject*>();
+	this->conceptObjectArray = new std::vector<ConceptObject*>();
 	this->currentTime = 0.0;
 	this->maxDeltaTime = 0.5;
+	this->maxTimeStepSize = 0.0025;
 }
 
 /*virtual*/ Simulation::~Simulation()
@@ -18,6 +22,8 @@ Simulation::Simulation()
 	this->Clear();
 
 	delete this->physicsObjectMap;
+	delete this->physicalObjectArray;
+	delete this->conceptObjectArray;
 }
 
 void Simulation::Clear()
@@ -50,66 +56,97 @@ void Simulation::Tick()
 	
 	double presentTime = double(::clock()) / double(CLOCKS_PER_SEC);
 	double deltaTime = presentTime - this->currentTime;
-	this->currentTime = presentTime;
 	if (deltaTime > this->maxDeltaTime)
 	{
 		// The idea here is to prevent a debugger break, followed by a resume of
-		// the program from creating a very large time-step in the simulation.
+		// the program, from creating a very large time-step in the simulation.
+		this->currentTime = presentTime;
 		return;
 	}
 
-	for (auto pair : *this->physicsObjectMap)
-		pair.second->PrepareForTick(this);
-
-	for (auto pair : *this->physicsObjectMap)
-		pair.second->ApplyForcesAndTorques(this);
-
-	// Gather all the physical objects in the simulation.
-	std::vector<PhysicalObject*> physicalObjectArray;
+	// Bucket sort into physical and conceptual objects.
+	this->physicalObjectArray->clear();
+	this->conceptObjectArray->clear();
 	for (auto pair : *this->physicsObjectMap)
 	{
 		auto physicalObject = dynamic_cast<PhysicalObject*>(pair.second);
 		if (physicalObject)
-			physicalObjectArray.push_back(physicalObject);
+			this->physicalObjectArray->push_back(physicalObject);
+
+		auto conceptObject = dynamic_cast<ConceptObject*>(pair.second);
+		if (conceptObject)
+			this->conceptObjectArray->push_back(conceptObject);
 	}
 
 	// Determine how much space we need in our state vector.
 	VectorN currentState;
 	int N = 0;
-	for (PhysicalObject* physicalObject : physicalObjectArray)
+	for (PhysicalObject* physicalObject : *this->physicalObjectArray)
 		N += physicalObject->GetStateSpaceRequirement();
 	currentState.SetDimension(N);
 
-	// Put the state of the entire system into the vector.
+	// We assume each tick begins with no two physical objects interpenetrating.
+	// Note that a more sophisticated system would abstract the notion of what
+	// kind of integration technique we're using here, but I'm just going to use
+	// Euler integration here for the sake of simplicity.  Maybe that will be
+	// good enough?
+	this->ToStateVector(currentState);
+	while (this->currentTime < presentTime)
+	{
+		VectorN currentStateDerivative(currentState.GetDimension());
+		this->ToStateVectorDerivative(currentStateDerivative);
+
+		double timeStep = this->maxTimeStepSize;
+		if (this->currentTime + timeStep > presentTime)
+			timeStep = presentTime - this->currentTime;
+
+		VectorN nextState(currentState.GetDimension());
+		nextState = currentState + currentStateDerivative * timeStep;
+
+		this->FromStateVector(nextState);
+
+		if (!this->InterpenetrationDetected())
+		{
+			this->currentTime += timeStep;
+			currentState = nextState;
+		}
+		else
+		{
+			// TODO: Do a binary search for the exact time of collision up to a given tolerance.
+		}
+	}
+}
+
+bool Simulation::InterpenetrationDetected() const
+{
+	return false;
+}
+
+void Simulation::ToStateVector(VectorN& stateVector) const
+{
 	int i = 0;
-	for (PhysicalObject* physicalObject : physicalObjectArray)
-		physicalObject->GetStateToVector(currentState, i);
-	
-	// Integrate the system over the time delta.
-	VectorN newState(N);
-	EulerIntegrator<VectorN> integrator(0.0025);	// TODO: Need to formalize the time-step parameter here.  For now, choose it arbitrarily.
-	integrator.Integrate(currentState, newState, 0.0, deltaTime, [&physicalObjectArray](const VectorN& currentState, double currentTime, VectorN& currentStateDerivative) {
-		currentStateDerivative.SetDimension(currentState.GetDimension());
+	for (const PhysicalObject* physicalObject : *this->physicalObjectArray)
+		physicalObject->GetStateToVector(stateVector, i);
+}
 
-		// Make sure all the physical objects know their current state at this step of integration before we calculate derivatives.
-		int i = 0;
-		for (PhysicalObject* physicalObject : physicalObjectArray)
-			physicalObject->SetStateFromVector(currentState, i);
+void Simulation::FromStateVector(const VectorN& stateVector)
+{
+	int i = 0;
+	for (PhysicalObject* physicalObject : *this->physicalObjectArray)
+		physicalObject->SetStateFromVector(stateVector, i);
+}
 
-		// TODO: Check for collisions here and solve for constraints and collision forces?
-		//       For contacting forces or rest positions, we may need to halt integration
-		//       prematurely, calculate some new forces, then resume, or something like that.
+void Simulation::ToStateVectorDerivative(VectorN& stateVectorDerivative)
+{
+	for (PhysicalObject* physicalObject : *this->physicalObjectArray)
+		physicalObject->ZeroNetForcesAndTorques();
 
-		// Now ask the physical objects to calculate their derivatives.
-		i = 0;
-		for (PhysicalObject* physicalObject : physicalObjectArray)
-			physicalObject->CalcStateDerivatives(currentStateDerivative, i);
-	});
+	for (ConceptObject* conceptObject : *this->conceptObjectArray)
+		conceptObject->ApplyForcesAndTorques(this, this->currentTime);
 
-	// Finally, put the final state after integration back into the physical objects.
-	i = 0;
-	for (PhysicalObject* physicalObject : physicalObjectArray)
-		physicalObject->SetStateFromVector(newState, i);
+	int i = 0;
+	for (const PhysicalObject* physicalObject : *this->physicalObjectArray)
+		physicalObject->CalcStateDerivatives(stateVectorDerivative, i);
 }
 
 PhysicsObject* Simulation::FindPhysicsObject(const std::string& name)

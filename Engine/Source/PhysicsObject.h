@@ -17,8 +17,6 @@ namespace PhysicsEngine
 		virtual ~PhysicsObject();
 
 		virtual void DeleteSelf();		// May need to override this so that the object is freed in correct heap.
-		virtual void PrepareForTick(Simulation* sim);
-		virtual void ApplyForcesAndTorques(Simulation* sim);
 
 		const std::string& GetName() const { return *this->name; }
 
