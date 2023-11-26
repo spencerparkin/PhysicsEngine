@@ -11,6 +11,8 @@ namespace PhysicsEngine
 		JediForce();
 		virtual ~JediForce();
 
+		static JediForce* Create();
+
 		virtual void ApplyForces(Simulation* sim) override;
 
 		void SetForce(const Vector3& force) { this->force = force; }

@@ -46,6 +46,8 @@ void Frame::OnTimer(wxTimerEvent& event)
 	this->inTimer = true;
 
 	wxGetApp().simulation.Tick();
+
+	this->canvas->HandleKeypresses();
 	this->canvas->Refresh();
 
 	this->inTimer = false;

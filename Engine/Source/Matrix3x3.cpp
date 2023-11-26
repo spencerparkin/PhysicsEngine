@@ -48,30 +48,30 @@ void Matrix3x3::SetIdentity()
 void Matrix3x3::SetAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis)
 {
 	this->ele[0][0] = xAxis.x;
-	this->ele[0][1] = xAxis.y;
-	this->ele[0][2] = xAxis.z;
+	this->ele[1][0] = xAxis.y;
+	this->ele[2][0] = xAxis.z;
 
-	this->ele[1][0] = yAxis.x;
+	this->ele[0][1] = yAxis.x;
 	this->ele[1][1] = yAxis.y;
-	this->ele[1][2] = yAxis.z;
+	this->ele[2][1] = yAxis.z;
 
-	this->ele[2][0] = zAxis.x;
-	this->ele[2][1] = zAxis.y;
+	this->ele[0][2] = zAxis.x;
+	this->ele[1][2] = zAxis.y;
 	this->ele[2][2] = zAxis.z;
 }
 
 void Matrix3x3::GetAxes(Vector3& xAxis, Vector3& yAxis, Vector3& zAxis) const
 {
 	xAxis.x = this->ele[0][0];
-	xAxis.y = this->ele[0][1];
-	xAxis.z = this->ele[0][2];
+	xAxis.y = this->ele[1][0];
+	xAxis.z = this->ele[2][0];
 
-	yAxis.x = this->ele[1][0];
+	yAxis.x = this->ele[0][1];
 	yAxis.y = this->ele[1][1];
-	yAxis.z = this->ele[1][2];
+	yAxis.z = this->ele[2][1];
 
-	zAxis.x = this->ele[2][0];
-	zAxis.y = this->ele[2][1];
+	zAxis.x = this->ele[0][2];
+	zAxis.y = this->ele[1][2];
 	zAxis.z = this->ele[2][2];
 }
 

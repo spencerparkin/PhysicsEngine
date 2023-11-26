@@ -2,13 +2,17 @@
 
 #include <wx/glcanvas.h>
 #include "Vector3.h"
+#include "Matrix3x3.h"
 #include "PolygonMesh.h"
+#include "JediForce.h"
 
 class Canvas : public wxGLCanvas
 {
 public:
 	Canvas(wxWindow* parent);
 	virtual ~Canvas();
+
+	void HandleKeypresses();
 
 	void OnPaint(wxPaintEvent& event);
 	void OnSize(wxSizeEvent& event);
@@ -17,10 +21,12 @@ public:
 
 private:
 	void BindContext();
+	void CalcViewFrame(PhysicsEngine::Matrix3x3& viewFrame) const;
 
 	wxGLContext* context;
 	static int attributeList[];
 	PhysicsEngine::Vector3 cameraEye;
 	PhysicsEngine::Vector3 cameraSubject;
 	PhysicsEngine::Vector3 lightPosition;
+	PhysicsEngine::JediForce* jediForce;
 };

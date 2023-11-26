@@ -15,6 +15,11 @@ JediForce::JediForce()
 	delete this->target;
 }
 
+/*static*/ JediForce* JediForce::Create()
+{
+	return new JediForce();
+}
+
 /*virtual*/ void JediForce::ApplyForces(Simulation* sim)
 {
 	PhysicsObject* physicsObject = sim->FindPhysicsObject(*this->target);

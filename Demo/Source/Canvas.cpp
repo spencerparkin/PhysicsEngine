@@ -20,6 +20,9 @@ Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList)
 	this->Bind(wxEVT_SIZE, &Canvas::OnSize, this);
 	this->Bind(wxEVT_KEY_DOWN, &Canvas::OnKeyDown, this);
 	this->Bind(wxEVT_KEY_UP, &Canvas::OnKeyUp, this);
+
+	this->jediForce = wxGetApp().simulation.AddPhysicsObject<JediForce>("jedi_force");
+	this->jediForce->SetTarget("boxA");
 }
 
 /*virtual*/ Canvas::~Canvas()
@@ -32,11 +35,12 @@ void Canvas::OnPaint(wxPaintEvent& event)
 	this->BindContext();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	double aspectRatio = double(viewport[2]) / double(viewport[3]);
-	double fieldOfVision = 60.0;
+	double fieldOfVision = 50.0;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -110,6 +114,39 @@ void Canvas::OnSize(wxSizeEvent& event)
 	glViewport(0, 0, size.GetWidth(), size.GetHeight());
 
 	this->Refresh();
+}
+
+void Canvas::CalcViewFrame(Matrix3x3& viewFrame) const
+{
+	Vector3 upVector(0.0, 1.0, 0.0);
+	Vector3 zAxis = this->cameraEye - this->cameraSubject;
+	zAxis.Normalize();
+	Vector3 xAxis = upVector.CrossProduct(zAxis);
+	xAxis.Normalize();
+	Vector3 yAxis = zAxis.CrossProduct(xAxis);
+	viewFrame.SetAxes(xAxis, yAxis, zAxis);
+}
+
+void Canvas::HandleKeypresses()
+{
+	Matrix3x3 viewFrame;
+	this->CalcViewFrame(viewFrame);
+
+	Vector3 force(0.0, 0.0, 0.0);
+
+	if (wxGetKeyState(wxKeyCode::WXK_LEFT))
+		force += viewFrame * Vector3(-500.0, 0.0, 0.0);
+
+	if (wxGetKeyState(wxKeyCode::WXK_RIGHT))
+		force += viewFrame * Vector3(500.0, 0.0, 0.0);
+
+	if (wxGetKeyState(wxKeyCode::WXK_UP))
+		force += viewFrame * Vector3(0.0, 500.0, 0.0);
+
+	if (wxGetKeyState(wxKeyCode::WXK_DOWN))
+		force += viewFrame * Vector3(0.0, -500.0, 0.0);
+
+	this->jediForce->SetForce(force);
 }
 
 void Canvas::OnKeyDown(wxKeyEvent& event)
