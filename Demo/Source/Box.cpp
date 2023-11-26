@@ -72,6 +72,7 @@ bool Box::Setup(const Vector3& dimensions, const Vector3& initialPosition)
 
 		Plane plane;
 		polygon->MakePlane(plane, mesh.GetVertexArray());
+		const Vector3& localNormal = plane.normal;
 
 		glBegin(GL_POLYGON);
 		
@@ -79,9 +80,10 @@ bool Box::Setup(const Vector3& dimensions, const Vector3& initialPosition)
 		for (int j = 0; j < numVertices; j++)
 		{
 			const Vector3& localVertex = polygon->GetVertex(j, mesh);
+			Vector3 worldNormal = orientation * localNormal;
 			Vector3 worldVertex = orientation * localVertex + position;
 
-			glNormal3dv(&plane.normal.x);
+			glNormal3dv(&worldNormal.x);
 			glVertex3dv(&worldVertex.x);
 		}
 
