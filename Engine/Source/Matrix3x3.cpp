@@ -192,8 +192,14 @@ bool Matrix3x3::Invert()
 void Matrix3x3::Transpose()
 {
 	for (int i = 0; i < 3; i++)
+	{
 		for (int j = 0; j < i; j++)
+		{
+			double element = this->ele[i][j];
 			this->ele[i][j] = this->ele[j][i];
+			this->ele[j][i] = element;
+		}
+	}
 }
 
 bool Matrix3x3::Orthonormalize()

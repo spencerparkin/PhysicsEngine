@@ -12,9 +12,9 @@ int Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 
 Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList)
 {
-	this->cameraEye = Vector3(20.0, 10.0, 20.0);
+	this->cameraEye = Vector3(0.0, 0.0, 20.0); //Vector3(20.0, 10.0, 20.0);
 	this->cameraSubject = Vector3(0.0, 0.0, 0.0);
-	this->lightPosition = Vector3(10.0, 10.0, 0.0);
+	this->lightPosition = Vector3(10.0, 20.0, 50.0);
 
 	this->Bind(wxEVT_PAINT, &Canvas::OnPaint, this);
 	this->Bind(wxEVT_SIZE, &Canvas::OnSize, this);
@@ -149,9 +149,9 @@ void Canvas::HandleKeypresses()
 		force += viewFrame * Vector3(0.0, 500.0, 0.0);		// +Y	
 
 	// Apply a torque.
-	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD8))
-		torque += viewFrame * Vector3(-300.0, 0.0, 0.0);	// -X
 	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD2))
+		torque += viewFrame * Vector3(-300.0, 0.0, 0.0);	// -X
+	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD8))
 		torque += viewFrame * Vector3(300.0, 0.0, 0.0);		// +X
 	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD6))
 		torque += viewFrame * Vector3(0.0, -300.0, 0.0);	// -Y
