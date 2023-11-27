@@ -25,8 +25,8 @@
     <ClInclude Include="Source\Gravity.h" />
     <ClInclude Include="Source\JediForce.h" />
     <ClInclude Include="Source\JediTorque.h" />
+    <ClInclude Include="Source\LineSegment.h" />
     <ClInclude Include="Source\Matrix3x3.h" />
-    <ClInclude Include="Source\NumericalIntegrator.hpp" />
     <ClInclude Include="Source\PhysicalObject.h" />
     <ClInclude Include="Source\PhysicsObject.h" />
     <ClInclude Include="Source\Plane.h" />
@@ -43,6 +43,7 @@
     <ClCompile Include="Source\Gravity.cpp" />
     <ClCompile Include="Source\JediForce.cpp" />
     <ClCompile Include="Source\JediTorque.cpp" />
+    <ClCompile Include="Source\LineSegment.cpp" />
     <ClCompile Include="Source\Matrix3x3.cpp" />
     <ClCompile Include="Source\PhysicalObject.cpp" />
     <ClCompile Include="Source\PhysicsObject.cpp" />

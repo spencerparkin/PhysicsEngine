@@ -11,10 +11,12 @@
 #include <string>
 #include <list>
 #include <map>
+#include <set>
 #include <vector>
 #include <functional>
 #include <math.h>
 #include <time.h>
+#include <memory>
 
 #define PHY_ENG_EPS				1e-6
 #define PHY_ENG_PI				3.1415926536

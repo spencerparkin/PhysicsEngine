@@ -251,3 +251,38 @@ int RigidBody::FindFaceDividingThisAgainst(const RigidBody* rigidBody) const
 	
 	return true;
 }
+
+/*virtual*/ bool RigidBody::ResolveCollisionWith(const PhysicalObject* physicalObject)
+{
+	const RigidBody* rigidBody = dynamic_cast<const RigidBody*>(physicalObject);
+	if (!rigidBody)
+		return false;
+
+	auto meshA = std::shared_ptr<PolygonMesh>(this->mesh.Clone());
+	auto meshB = std::shared_ptr<PolygonMesh>(rigidBody->mesh.Clone());
+
+	meshA->Transform(this->position, this->orientation);
+	meshB->Transform(rigidBody->position, rigidBody->orientation);
+
+	std::vector<PolygonMesh::ContactPoint> contactPointArray;
+	PolygonMesh::CalculateContactPoints(*meshA, *meshB, contactPointArray);
+
+	// If they are not touching one another, there is nothing for us to do.
+	// This shouldn't happen since we shouldn't be called unless the calling
+	// code is sure that we're in collision with the given object.
+	if (contactPointArray.size() == 0)
+		return false;
+
+	if (contactPointArray.size() == 1)
+	{
+		//...
+	}
+	else
+	{
+		// TODO: Punt for now on the case of two or more contact points.  I'll revisit this
+		//       case after I've solved the case of just a single contact point.
+		return false;
+	}
+
+	return true;
+}

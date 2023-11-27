@@ -13,9 +13,6 @@
     <ClInclude Include="Source\Common.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\NumericalIntegrator.hpp">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="Source\AxisAlignedBoundingBox.h">
       <Filter>Source</Filter>
     </ClInclude>
@@ -59,6 +56,9 @@
       <Filter>Source\PhysicsObjects</Filter>
     </ClInclude>
     <ClInclude Include="Source\ConceptObject.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LineSegment.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
@@ -106,6 +106,9 @@
       <Filter>Source\PhysicsObjects</Filter>
     </ClCompile>
     <ClCompile Include="Source\ConceptObject.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\LineSegment.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

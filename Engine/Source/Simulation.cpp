@@ -136,7 +136,7 @@ void Simulation::Tick()
 			this->FromStateVector(currentState);
 			this->currentTime = timeB;
 
-			this->ForAllCollisionPairs([this](const PhysicalObject* objectA, const PhysicalObject* objectB) -> bool {
+			this->ForAllCollisionPairs([this](PhysicalObject* objectA, PhysicalObject* objectB) -> bool {
 				this->ResolveCollision(objectA, objectB);
 				return true;
 			});
@@ -147,28 +147,28 @@ void Simulation::Tick()
 bool Simulation::InterpenetrationDetected() const
 {
 	bool collisionDetected = false;
-	this->ForAllCollisionPairs([&collisionDetected](const PhysicalObject* objectA, const PhysicalObject* objectB) -> bool {
+	const_cast<Simulation*>(this)->ForAllCollisionPairs([&collisionDetected](PhysicalObject* objectA, PhysicalObject* objectB) -> bool {
 		collisionDetected = true;
 		return false;	// Bail out of iteration at the first detected collision.
 	});
 	return collisionDetected;
 }
 
-void Simulation::ForAllCollisionPairs(CollisionPairFunc collisionPairFunc) const
+void Simulation::ForAllCollisionPairs(CollisionPairFunc collisionPairFunc)
 {
 	// TODO: Here I'm going to do an O(N^2) algorithm, but this should
 	//       eventually be replaced with something closer to O(N log N).
 
 	for (int i = 0; i < (signed)this->physicalObjectArray->size(); i++)
 	{
-		const PhysicalObject* objectA = (*this->physicalObjectArray)[i];
+		PhysicalObject* objectA = (*this->physicalObjectArray)[i];
 		AxisAlignedBoundingBox boxA;
 		if (!objectA->GetBoundingBox(boxA))
 			continue;
 
 		for (int j = i + 1; j < (signed)this->physicalObjectArray->size(); j++)
 		{
-			const PhysicalObject* objectB = (*this->physicalObjectArray)[j];
+			PhysicalObject* objectB = (*this->physicalObjectArray)[j];
 			AxisAlignedBoundingBox boxB;
 			if (!objectB->GetBoundingBox(boxB))
 				continue;
@@ -226,11 +226,13 @@ PhysicsObject* Simulation::FindPhysicsObject(const std::string& name)
 	return iter->second;
 }
 
-void Simulation::ResolveCollision(const PhysicalObject* objectA, const PhysicalObject* objectB)
+void Simulation::ResolveCollision(PhysicalObject* objectA, PhysicalObject* objectB)
 {
 	// Up to this point, we've done the bare minimum amount of work to know if and
 	// when two objects are in collision with one another.  Here now we are going to
 	// determine how they are in collision and then what to do about it.
 
-
+	// Deligate this work to the objects themselves.
+	if (!objectA->ResolveCollisionWith(objectB))
+		objectB->ResolveCollisionWith(objectA);
 }

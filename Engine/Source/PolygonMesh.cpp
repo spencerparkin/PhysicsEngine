@@ -1,6 +1,8 @@
 #include "PolygonMesh.h"
 #include "Vector3.h"
+#include "Matrix3x3.h"
 #include "Plane.h"
+#include "LineSegment.h"
 #include "AxisAlignedBoundingBox.h"
 
 using namespace PhysicsEngine;
@@ -28,6 +30,11 @@ void PolygonMesh::Clear()
 
 	this->polygonArray->clear();
 	this->vertexArray->clear();
+}
+
+PolygonMesh* PolygonMesh::Clone() const
+{
+	return nullptr;
 }
 
 bool PolygonMesh::GenerateConvexHull(const std::vector<Vector3>& pointArray)
@@ -238,10 +245,19 @@ bool PolygonMesh::CalcBoundingBox(AxisAlignedBoundingBox& aabb) const
 	return true;
 }
 
-void PolygonMesh::Translate(const Vector3& translationDelta)
+void PolygonMesh::Translate(const Vector3& translation)
 {
 	for (Vector3& vertex : *this->vertexArray)
-		vertex += translationDelta;
+		vertex += translation;
+
+	for (Polygon* polygon : *this->polygonArray)
+		polygon->InvalidateCachedPlane();
+}
+
+void PolygonMesh::Transform(const Vector3& translation, const Matrix3x3& orientation)
+{
+	for (Vector3& vertex : *this->vertexArray)
+		vertex = orientation * vertex + translation;
 
 	for (Polygon* polygon : *this->polygonArray)
 		polygon->InvalidateCachedPlane();
@@ -258,6 +274,111 @@ const PolygonMesh::Polygon* PolygonMesh::GetPolygon(int i) const
 		return nullptr;
 
 	return (*this->polygonArray)[i];
+}
+
+bool PolygonMesh::CalcCenter(Vector3& center) const
+{
+	if (this->vertexArray->size() == 0)
+		return false;
+
+	center = Vector3(0.0, 0.0, 0.0);
+	for (const Vector3& vertex : *this->vertexArray)
+		center += vertex;
+
+	center *= 1.0 / double(this->vertexArray->size());
+	return true;
+}
+
+/*static*/ void PolygonMesh::CalculateContactPoints(const PolygonMesh& meshA, const PolygonMesh& meshB, std::vector<ContactPoint>& contactPointArray)
+{
+	contactPointArray.clear();
+
+	// Note that contact normals will always point from A to B.
+	meshA.GenerateFaceWithVertexContactPoints(meshB, contactPointArray, -1.0);
+	meshB.GenerateFaceWithVertexContactPoints(meshA, contactPointArray, 1.0);
+
+	// Note that caching this information with the mesh could provide a speed up.
+	std::vector<Edge> edgeArrayA, edgeArrayB;
+	meshA.GenerateEdgeArray(edgeArrayA);
+	meshB.GenerateEdgeArray(edgeArrayB);
+
+	Vector3 centerA;
+	meshA.CalcCenter(centerA);
+
+	for (const Edge& edgeA : edgeArrayA)
+	{
+		LineSegment segA(meshA.GetVertexArray()[edgeA.i], meshA.GetVertexArray()[edgeA.j]);
+
+		for (const Edge& edgeB : edgeArrayB)
+		{
+			LineSegment segB(meshA.GetVertexArray()[edgeB.i], meshA.GetVertexArray()[edgeB.j]);
+
+			Vector3 intersectionPoint;
+			if (LineSegment::Intersect(segA, segB, intersectionPoint))
+			{
+				ContactPoint contactPoint;
+				contactPoint.point = intersectionPoint;
+				contactPoint.normal = (segA.pointB - segA.pointA).CrossProduct(segB.pointB - segB.pointA);
+				contactPoint.normal.Normalize();
+				
+				// Not sure if there's a better way to do this, but...
+				if (((contactPoint.point + contactPoint.normal) - centerA).Length() < ((contactPoint.point - contactPoint.normal) - centerA).Length())
+					contactPoint.normal = -contactPoint.normal;
+
+				contactPointArray.push_back(contactPoint);
+			}
+		}
+	}
+}
+
+void PolygonMesh::GenerateFaceWithVertexContactPoints(const PolygonMesh& mesh, std::vector<ContactPoint>& contactPointArray, double normalSign) const
+{
+	for (const Vector3& vertex : *this->vertexArray)
+	{
+		const PolygonMesh::Polygon* polygon = mesh.FindFaceContainingVertex(vertex);
+		if (polygon)
+		{
+			Plane plane;
+			polygon->MakePlane(plane, mesh.GetVertexArray());
+			contactPointArray.push_back(ContactPoint{ vertex, plane.normal * normalSign });
+		}
+	}
+}
+
+const PolygonMesh::Polygon* PolygonMesh::FindFaceContainingVertex(const Vector3& vertex) const
+{
+	for (const Polygon* polygon : *this->polygonArray)
+		if (polygon->ContainsVertex(vertex, *this->vertexArray))
+			return polygon;
+
+	return nullptr;
+}
+
+void PolygonMesh::GenerateEdgeArray(std::vector<Edge>& edgeArray) const
+{
+	std::set<Edge> edgeSet;
+
+	for (const Polygon* polygon : *this->polygonArray)
+	{
+		for (int i = 0; i < (signed)polygon->vertexArray->size(); i++)
+		{
+			int j = (i + 1) % polygon->vertexArray->size();
+			Edge edge{ i, j };
+			if (edgeSet.find(edge) == edgeSet.end())
+			{
+				edgeArray.push_back(edge);
+				edgeSet.insert(edge);
+			}
+		}
+	}
+}
+
+uint64_t PolygonMesh::Edge::CalcKey() const
+{
+	if (this->j < this->i)
+		return uint64_t(this->j) | (uint64_t(this->i) << 32);
+
+	return uint64_t(this->i) | (uint64_t(this->j) << 32);
 }
 
 //------------------------------------ PolygonMesh::Polygon ------------------------------------
@@ -457,6 +578,30 @@ bool PolygonMesh::Polygon::HasVertex(int i) const
 	return false;
 }
 
+bool PolygonMesh::Polygon::ContainsVertex(const Vector3& vertex, const std::vector<Vector3>& pointArray, double thickness /*= PHY_ENG_EPS*/) const
+{
+	Plane polygonPlane;
+	this->MakePlane(polygonPlane, pointArray);
+	if (polygonPlane.WhichSide(vertex, thickness) != Plane::Side::NEITHER)
+		return false;
+
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
+	{
+		int j = (i + 1) % this->vertexArray->size();
+
+		const Vector3& edgePointA = pointArray[(*this->vertexArray)[i]];
+		const Vector3& edgePointB = pointArray[(*this->vertexArray)[j]];
+
+		Vector3 edgeNormal = (edgePointB - edgePointA).CrossProduct(polygonPlane.normal);
+		Plane edgePlane(edgePointA, edgeNormal);
+
+		if (edgePlane.WhichSide(vertex, thickness) == Plane::Side::FRONT)
+			return false;
+	}
+
+	return true;
+}
+
 //------------------------------------ PolygonMesh::Triangle ------------------------------------
 
 bool PolygonMesh::Triangle::IsCanceledBy(const Triangle& triangle) const
@@ -492,4 +637,15 @@ double PolygonMesh::Triangle::CalcArea(const std::vector<Vector3>& pointArray) c
 	const Vector3& pointB = pointArray[this->vertex[1]];
 	const Vector3& pointC = pointArray[this->vertex[2]];
 	return (pointB - pointA).CrossProduct(pointC - pointA).Length() / 2.0;
+}
+
+namespace PhysicsEngine
+{
+	bool operator<(const PolygonMesh::Edge& edgeA, const PolygonMesh::Edge& edgeB)
+	{
+		uint64_t keyA = edgeA.CalcKey();
+		uint64_t keyB = edgeB.CalcKey();
+
+		return keyA < keyB;
+	}
 }

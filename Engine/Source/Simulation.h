@@ -44,10 +44,10 @@ namespace PhysicsEngine
 		void ToStateVectorDerivative(VectorN& stateVectorDerivative);
 
 		bool InterpenetrationDetected() const;
-		void ResolveCollision(const PhysicalObject* objectA, const PhysicalObject* objectB);
+		void ResolveCollision(PhysicalObject* objectA, PhysicalObject* objectB);
 
-		typedef std::function<bool(const PhysicalObject*, const PhysicalObject*)> CollisionPairFunc;
-		void ForAllCollisionPairs(CollisionPairFunc collisionPairFunc) const;
+		typedef std::function<bool(PhysicalObject*, PhysicalObject*)> CollisionPairFunc;
+		void ForAllCollisionPairs(CollisionPairFunc collisionPairFunc);
 
 		// TODO: At some point we need to index all physics objects using
 		//       a spacial partitioning datastructure in order to facilitate

@@ -40,6 +40,11 @@ PhysicalObject::PhysicalObject()
 	return CollisionResult::UNKNOWN;
 }
 
+/*virtual*/ bool PhysicalObject::ResolveCollisionWith(const PhysicalObject* physicalObject)
+{
+	return false;
+}
+
 /*virtual*/ bool PhysicalObject::GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const
 {
 	return false;
