@@ -49,6 +49,8 @@ namespace PhysicsEngine
 		typedef std::function<bool(PhysicalObject*, PhysicalObject*)> CollisionPairFunc;
 		void ForAllCollisionPairs(CollisionPairFunc collisionPairFunc);
 
+		bool tickEnabled;
+
 		// TODO: At some point we need to index all physics objects using
 		//       a spacial partitioning datastructure in order to facilitate
 		//       efficient collision detection.

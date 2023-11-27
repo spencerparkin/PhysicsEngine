@@ -368,7 +368,7 @@ void PolygonMesh::GenerateEdgeArray(std::vector<Edge>& edgeArray) const
 		for (int i = 0; i < (signed)polygon->vertexArray->size(); i++)
 		{
 			int j = (i + 1) % polygon->vertexArray->size();
-			Edge edge{ i, j };
+			Edge edge{ (*polygon->vertexArray)[i], (*polygon->vertexArray)[j] };
 			if (edgeSet.find(edge) == edgeSet.end())
 			{
 				edgeArray.push_back(edge);

@@ -24,6 +24,13 @@ private:
 	void BindContext();
 	void CalcViewFrame(PhysicsEngine::Matrix3x3& viewFrame) const;
 
+	enum class KeyboardMode
+	{
+		FREE_CAM,
+		MAKE_FORCES
+	};
+
+	KeyboardMode keyboardMode;
 	wxGLContext* context;
 	static int attributeList[];
 	PhysicsEngine::Vector3 cameraEye;

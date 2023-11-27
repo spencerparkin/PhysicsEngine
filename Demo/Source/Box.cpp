@@ -48,6 +48,7 @@ bool Box::Setup(const Vector3& dimensions, const Vector3& initialPosition)
 	const Vector3& position = this->GetLocation();
 	const Matrix3x3& orientation = this->GetOrientation();
 
+	glEnable(GL_LIGHTING);
 	glColor3dv(&this->color.x);
 
 	GLfloat diffuseColor[] = { (GLfloat)this->color.x, (GLfloat)this->color.y, (GLfloat)this->color.z, 1.0f };
@@ -89,4 +90,31 @@ bool Box::Setup(const Vector3& dimensions, const Vector3& initialPosition)
 
 		glEnd();
 	}
+
+	glDisable(GL_LIGHTING);
+	glLineWidth(1.5f);
+	glBegin(GL_LINES);
+	glColor3f(1.0f, 1.0f, 1.0f);
+
+	Vector3 meshCenter;
+	mesh.CalcCenter(meshCenter);
+
+	std::vector<PolygonMesh::Edge> edgeArray;
+	mesh.GenerateEdgeArray(edgeArray);
+	for (const PolygonMesh::Edge& edge : edgeArray)
+	{
+		Vector3 localVertexA = mesh.GetVertexArray()[edge.i];
+		Vector3 localVertexB = mesh.GetVertexArray()[edge.j];
+
+		localVertexA = meshCenter + (localVertexA - meshCenter) * 1.001;
+		localVertexB = meshCenter + (localVertexB - meshCenter) * 1.001;
+
+		Vector3 worldVertexA = orientation * localVertexA + position;
+		Vector3 worldVertexB = orientation * localVertexB + position;
+
+		glVertex3dv(&worldVertexA.x);
+		glVertex3dv(&worldVertexB.x);
+	}
+
+	glEnd();
 }

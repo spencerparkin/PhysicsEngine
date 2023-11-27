@@ -12,6 +12,7 @@ int Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 
 Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList)
 {
+	this->keyboardMode = KeyboardMode::FREE_CAM;
 	this->cameraEye = Vector3(0.0, 0.0, 10.0);
 	this->cameraSubject = Vector3(0.0, 0.0, 0.0);
 	this->lightPosition = Vector3(10.0, 20.0, 50.0);
@@ -85,7 +86,6 @@ void Canvas::OnPaint(wxPaintEvent& event)
 
 	glEnd();
 
-	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
 	GLfloat lightColor[] = { 1.f, 1.f, 1.f, 1.f };
@@ -135,32 +135,83 @@ void Canvas::HandleKeypresses()
 	Matrix3x3 viewFrame;
 	this->CalcViewFrame(viewFrame);
 
-	Vector3 force(0.0, 0.0, 0.0);
-	Vector3 torque(0.0, 0.0, 0.0);
-	double strength = 50.0;
+	switch (keyboardMode)
+	{
+		case KeyboardMode::MAKE_FORCES:
+		{
+			Vector3 force(0.0, 0.0, 0.0);
+			Vector3 torque(0.0, 0.0, 0.0);
+			double strength = 50.0;
 
-	// Apply a force.
-	if (wxGetKeyState(wxKeyCode::WXK_LEFT))
-		force += viewFrame * Vector3(-strength, 0.0, 0.0);		// -X
-	if (wxGetKeyState(wxKeyCode::WXK_RIGHT))
-		force += viewFrame * Vector3(strength, 0.0, 0.0);		// +X
-	if (wxGetKeyState(wxKeyCode::WXK_DOWN))
-		force += viewFrame * Vector3(0.0, -strength, 0.0);		// -Y
-	if (wxGetKeyState(wxKeyCode::WXK_UP))
-		force += viewFrame * Vector3(0.0, strength, 0.0);		// +Y	
+			// Apply a force.
+			if (wxGetKeyState(wxKeyCode::WXK_LEFT))
+				force += viewFrame * Vector3(-strength, 0.0, 0.0);		// -X
+			if (wxGetKeyState(wxKeyCode::WXK_RIGHT))
+				force += viewFrame * Vector3(strength, 0.0, 0.0);		// +X
+			if (wxGetKeyState(wxKeyCode::WXK_DOWN))
+				force += viewFrame * Vector3(0.0, -strength, 0.0);		// -Y
+			if (wxGetKeyState(wxKeyCode::WXK_UP))
+				force += viewFrame * Vector3(0.0, strength, 0.0);		// +Y	
 
-	// Apply a torque.
-	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD2))
-		torque += viewFrame * Vector3(-strength, 0.0, 0.0);		// -X
-	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD8))
-		torque += viewFrame * Vector3(strength, 0.0, 0.0);		// +X
-	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD6))
-		torque += viewFrame * Vector3(0.0, -strength, 0.0);		// -Y
-	if (wxGetKeyState(wxKeyCode::WXK_NUMPAD4))
-		torque += viewFrame * Vector3(0.0, strength, 0.0);		// +Y
+			// Apply a torque.
+			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD2))
+				torque += viewFrame * Vector3(-strength, 0.0, 0.0);		// -X
+			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD8))
+				torque += viewFrame * Vector3(strength, 0.0, 0.0);		// +X
+			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD6))
+				torque += viewFrame * Vector3(0.0, -strength, 0.0);		// -Y
+			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD4))
+				torque += viewFrame * Vector3(0.0, strength, 0.0);		// +Y
 
-	this->jediForce->SetForce(force);
-	this->jediTorque->SetTorque(torque);
+			this->jediForce->SetForce(force);
+			this->jediTorque->SetTorque(torque);
+			break;
+		}
+		case KeyboardMode::FREE_CAM:
+		{
+			double sensativity = 0.2;
+
+			if (wxGetKeyState(wxKeyCode::WXK_ALT))
+			{
+				Vector3 subjectDelta(0.0, 0.0, 0.0);
+
+				if (wxGetKeyState(wxKeyCode::WXK_LEFT))
+					subjectDelta += viewFrame * Vector3(-sensativity, 0.0, 0.0);
+				if (wxGetKeyState(wxKeyCode::WXK_RIGHT))
+					subjectDelta += viewFrame * Vector3(sensativity, 0.0, 0.0);
+				if (wxGetKeyState(wxKeyCode::WXK_DOWN))
+					subjectDelta += viewFrame * Vector3(0.0, -sensativity, 0.0);
+				if (wxGetKeyState(wxKeyCode::WXK_UP))
+					subjectDelta += viewFrame * Vector3(0.0, sensativity, 0.0);
+
+				Vector3 lookVector = this->cameraSubject - this->cameraEye;
+				double length;
+				lookVector.Normalize(&length);
+				this->cameraSubject += subjectDelta;
+				lookVector = this->cameraSubject - this->cameraEye;
+				lookVector.Normalize();
+				lookVector *= length;
+			}
+			else
+			{
+				Vector3 cameraDelta(0.0, 0.0, 0.0);
+
+				if (wxGetKeyState(wxKeyCode::WXK_LEFT))
+					cameraDelta += viewFrame * Vector3(-sensativity, 0.0, 0.0);
+				if (wxGetKeyState(wxKeyCode::WXK_RIGHT))
+					cameraDelta += viewFrame * Vector3(sensativity, 0.0, 0.0);
+				if (wxGetKeyState(wxKeyCode::WXK_DOWN))
+					cameraDelta += viewFrame * Vector3(0.0, 0.0, sensativity);
+				if (wxGetKeyState(wxKeyCode::WXK_UP))
+					cameraDelta += viewFrame * Vector3(0.0, 0.0, -sensativity);
+
+				this->cameraEye += cameraDelta;
+				this->cameraSubject += cameraDelta;
+			}
+
+			break;
+		}
+	}
 }
 
 void Canvas::OnKeyDown(wxKeyEvent& event)
@@ -192,6 +243,15 @@ void Canvas::OnKeyUp(wxKeyEvent& event)
 		{
 			this->jediForce->SetTarget("boxB");
 			this->jediTorque->SetTarget("boxB");
+			break;
+		}
+		case 'm':
+		case 'M':
+		{
+			if (this->keyboardMode == KeyboardMode::FREE_CAM)
+				this->keyboardMode = KeyboardMode::MAKE_FORCES;
+			else
+				this->keyboardMode = KeyboardMode::FREE_CAM;
 			break;
 		}
 	}

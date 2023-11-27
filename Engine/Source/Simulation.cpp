@@ -16,6 +16,7 @@ Simulation::Simulation()
 	this->maxDeltaTime = 0.5;
 	this->maxTimeStepSize = 0.0025;
 	this->collisionTimeTolerance = 0.0005;
+	this->tickEnabled = true;
 }
 
 /*virtual*/ Simulation::~Simulation()
@@ -48,6 +49,9 @@ bool Simulation::RemovePhysicsObject(const std::string& name)
 
 void Simulation::Tick()
 {
+	if (!this->tickEnabled)
+		return;
+
 	if (this->currentTime == 0.0)
 	{
 		// This is our first tick.  Just initialize time and bail.
@@ -140,6 +144,12 @@ void Simulation::Tick()
 				this->ResolveCollision(objectA, objectB);
 				return true;
 			});
+
+			// DEBUG CODE!
+#if 1
+			this->tickEnabled = false;
+			return;
+#endif
 		}
 	}
 }
