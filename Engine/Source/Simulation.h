@@ -44,7 +44,8 @@ namespace PhysicsEngine
 		void ToStateVectorDerivative(VectorN& stateVectorDerivative);
 
 		bool InterpenetrationDetected() const;
-		
+		void ResolveCollision(const PhysicalObject* objectA, const PhysicalObject* objectB);
+
 		typedef std::function<bool(const PhysicalObject*, const PhysicalObject*)> CollisionPairFunc;
 		void ForAllCollisionPairs(CollisionPairFunc collisionPairFunc) const;
 

@@ -137,7 +137,7 @@ void Simulation::Tick()
 			this->currentTime = timeB;
 
 			this->ForAllCollisionPairs([this](const PhysicalObject* objectA, const PhysicalObject* objectB) -> bool {
-				// TODO: Resolve the collision here.  :/
+				this->ResolveCollision(objectA, objectB);
 				return true;
 			});
 		}
@@ -224,4 +224,13 @@ PhysicsObject* Simulation::FindPhysicsObject(const std::string& name)
 		return nullptr;
 
 	return iter->second;
+}
+
+void Simulation::ResolveCollision(const PhysicalObject* objectA, const PhysicalObject* objectB)
+{
+	// Up to this point, we've done the bare minimum amount of work to know if and
+	// when two objects are in collision with one another.  Here now we are going to
+	// determine how they are in collision and then what to do about it.
+
+
 }
