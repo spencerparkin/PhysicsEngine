@@ -2,7 +2,7 @@
 #include "PhysicsObject.h"
 #include "PhysicalObject.h"
 #include "ConceptObject.h"
-#include "NumericalIntegrator.hpp"
+#include "AxisAlignedBoundingBox.h"
 #include "VectorN.h"
 
 using namespace PhysicsEngine;
@@ -132,17 +132,62 @@ void Simulation::Tick()
 				}
 			}
 
-			// This is the approximate time of our collision.
+			currentState += currentStateDerivative * (timeB - timeA);
+			this->FromStateVector(currentState);
 			this->currentTime = timeB;
 
-			// TODO: Resolve the collision, then let regular integration resume.
+			this->ForAllCollisionPairs([this](const PhysicalObject* objectA, const PhysicalObject* objectB) -> bool {
+				// TODO: Resolve the collision here.  :/
+				return true;
+			});
 		}
 	}
 }
 
 bool Simulation::InterpenetrationDetected() const
 {
-	return false;
+	bool collisionDetected = false;
+	this->ForAllCollisionPairs([&collisionDetected](const PhysicalObject* objectA, const PhysicalObject* objectB) -> bool {
+		collisionDetected = true;
+		return false;	// Bail out of iteration at the first detected collision.
+	});
+	return collisionDetected;
+}
+
+void Simulation::ForAllCollisionPairs(CollisionPairFunc collisionPairFunc) const
+{
+	// TODO: Here I'm going to do an O(N^2) algorithm, but this should
+	//       eventually be replaced with something closer to O(N log N).
+
+	for (int i = 0; i < (signed)this->physicalObjectArray->size(); i++)
+	{
+		const PhysicalObject* objectA = (*this->physicalObjectArray)[i];
+		AxisAlignedBoundingBox boxA;
+		if (!objectA->GetBoundingBox(boxA))
+			continue;
+
+		for (int j = i + 1; j < (signed)this->physicalObjectArray->size(); j++)
+		{
+			const PhysicalObject* objectB = (*this->physicalObjectArray)[j];
+			AxisAlignedBoundingBox boxB;
+			if (!objectB->GetBoundingBox(boxB))
+				continue;
+
+			AxisAlignedBoundingBox intersection;
+			if (!intersection.Intersect(boxA, boxB))
+				continue;
+
+			PhysicalObject::CollisionResult result = objectA->IsInCollsionWith(objectB);
+			if (result == PhysicalObject::CollisionResult::UNKNOWN)
+				result = objectB->IsInCollsionWith(objectA);	// If object A didn't know, deligate to object B.
+
+			if (result != PhysicalObject::CollisionResult::IN_COLLISION)
+				continue;
+
+			if (!collisionPairFunc(objectA, objectB))
+				return;
+		}
+	}
 }
 
 void Simulation::ToStateVector(VectorN& stateVector) const

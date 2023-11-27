@@ -190,3 +190,15 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 {
 	this->netTorque += torque;
 }
+
+/*virtual*/ PhysicalObject::CollisionResult RigidBody::IsInCollsionWith(const PhysicalObject* physicalObject) const
+{
+	// TODO: Write this.
+	return PhysicalObject::CollisionResult::UNKNOWN;
+}
+
+/*virtual*/ bool RigidBody::GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const
+{
+	// TODO: Write this.
+	return false;
+}

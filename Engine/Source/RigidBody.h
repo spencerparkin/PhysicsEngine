@@ -42,6 +42,8 @@ namespace PhysicsEngine
 		virtual void SetStateFromVector(const VectorN& stateVector, int& i) override;
 		virtual void GetStateToVector(VectorN& stateVector, int& i) const override;
 		virtual void CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const override;
+		virtual CollisionResult IsInCollsionWith(const PhysicalObject* physicalObject) const override;
+		virtual bool GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const override;
 
 	private:
 

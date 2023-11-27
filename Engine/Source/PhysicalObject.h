@@ -6,12 +6,20 @@ namespace PhysicsEngine
 {
 	class Vector3;
 	class VectorN;
+	class AxisAlignedBoundingBox;
 
 	class PHYSICS_ENGINE_API PhysicalObject : public PhysicsObject
 	{
 	public:
 		PhysicalObject();
 		virtual ~PhysicalObject();
+
+		enum class CollisionResult
+		{
+			UNKNOWN,
+			IN_COLLISION,
+			NOT_IN_COLLISION
+		};
 
 		virtual double GetMass() const = 0;
 		virtual void AccumulateForce(const Vector3& force) = 0;
@@ -21,5 +29,7 @@ namespace PhysicsEngine
 		virtual void GetStateToVector(VectorN& stateVector, int& i) const;
 		virtual void CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const;
 		virtual void ZeroNetForcesAndTorques();
+		virtual CollisionResult IsInCollsionWith(const PhysicalObject* physicalObject) const;
+		virtual bool GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const;
 	};
 }

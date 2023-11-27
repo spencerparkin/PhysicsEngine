@@ -34,3 +34,13 @@ PhysicalObject::PhysicalObject()
 /*virtual*/ void PhysicalObject::ZeroNetForcesAndTorques()
 {
 }
+
+/*virtual*/ PhysicalObject::CollisionResult PhysicalObject::IsInCollsionWith(const PhysicalObject* physicalObject) const
+{
+	return CollisionResult::UNKNOWN;
+}
+
+/*virtual*/ bool PhysicalObject::GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const
+{
+	return false;
+}
