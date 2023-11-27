@@ -53,10 +53,28 @@ Vector3 LineSegment::Lerp(double alpha) const
 
 	// Verify that the 4 points are coplanar to within the given epsilon.
 	Vector3 vector = numeratorVectorNormalized.CrossProduct(denominatorVectorNormalized);
-	if (vector.Length() >= eps)
+	if (vector.Length() > eps)
 		return false;
 
+	// Make sure the lerp-alpha is approximately in the range [0,1].
 	double alpha = -numerator / denominator;
-	intersectionPoint = lineSegA.Lerp(alpha);
+	if (alpha < -eps || alpha > 1.0 + eps)
+		return false;
+
+	Vector3 intersectionPointA = lineSegA.Lerp(alpha);
+	Vector3 intersectionPointB = lineSegB.NearestPoint(intersectionPointA);
+	double distance = (intersectionPointA - intersectionPointB).Length();
+	if (distance > eps)
+		return false;
+
+	intersectionPoint = (intersectionPointA + intersectionPointB) / 2.0;
 	return true;
+}
+
+Vector3 LineSegment::NearestPoint(const Vector3& point) const
+{
+	Vector3 direction = this->pointB - this->pointA;
+	direction.Normalize();
+	Vector3 nearestPoint = this->pointA + (point - this->pointA).InnerProduct(direction) * direction;
+	return nearestPoint;
 }

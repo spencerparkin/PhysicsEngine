@@ -13,6 +13,7 @@ namespace PhysicsEngine
 		virtual ~LineSegment();
 
 		Vector3 Lerp(double alpha) const;
+		Vector3 NearestPoint(const Vector3& point) const;
 		static bool Intersect(const LineSegment& lineSegA, const LineSegment& lineSegB, Vector3& intersectionPoint, double eps = PHY_ENG_EPS);
 
 		Vector3 pointA, pointB;
