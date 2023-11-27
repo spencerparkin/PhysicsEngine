@@ -1,4 +1,5 @@
 #include "Plane.h"
+#include "Matrix3x3.h"
 
 using namespace PhysicsEngine;
 
@@ -46,4 +47,12 @@ Plane::Side Plane::WhichSide(const Vector3& point, double tickness /*= PHY_ENG_E
 		return Side::FRONT;
 
 	return Side::NEITHER;
+}
+
+void Plane::Transform(const Vector3& translation, const Matrix3x3& rotation)
+{
+	Vector3 center = rotation * this->CalcCenter() + translation;
+	this->normal = rotation * this->normal;
+	this->normal.Normalize();
+	this->D = center.InnerProduct(this->normal);
 }

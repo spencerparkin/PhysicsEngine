@@ -1,6 +1,6 @@
 #include "RigidBody.h"
 #include "AxisAlignedBoundingBox.h"
-#include "NumericalIntegrator.hpp"
+#include "Plane.h"
 #include "VectorN.h"
 
 using namespace PhysicsEngine;
@@ -193,12 +193,61 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 
 /*virtual*/ PhysicalObject::CollisionResult RigidBody::IsInCollsionWith(const PhysicalObject* physicalObject) const
 {
-	// TODO: Write this.
-	return PhysicalObject::CollisionResult::UNKNOWN;
+	const RigidBody* rigidBody = dynamic_cast<const RigidBody*>(physicalObject);
+	if (!rigidBody)
+		return CollisionResult::UNKNOWN;
+
+	int i = this->FindFaceDividingThisAgainst(rigidBody);
+	if (i >= 0)
+		return CollisionResult::NOT_IN_COLLISION;
+
+	i = rigidBody->FindFaceDividingThisAgainst(this);
+	if (i >= 0)
+		return CollisionResult::NOT_IN_COLLISION;
+
+	return CollisionResult::IN_COLLISION;
+}
+
+int RigidBody::FindFaceDividingThisAgainst(const RigidBody* rigidBody) const
+{
+	for (int i = 0; i < this->mesh.GetNumPolygons(); i++)
+	{
+		const PolygonMesh::Polygon* polygon = this->mesh.GetPolygon(i);
+		Plane plane;
+		polygon->MakePlane(plane, this->mesh.GetVertexArray());
+		plane.Transform(this->position, this->orientation);
+		bool dividingPlane = true;
+		for (int j = 0; j < (signed)rigidBody->mesh.GetVertexArray().size(); j++)
+		{
+			Vector3 vertex = rigidBody->position + rigidBody->orientation * rigidBody->mesh.GetVertexArray()[j];
+			if (plane.WhichSide(vertex) == Plane::Side::BACK)
+			{
+				dividingPlane = false;
+				break;
+			}
+		}
+
+		if (dividingPlane)
+			return i;
+	}
+
+	return -1;
 }
 
 /*virtual*/ bool RigidBody::GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const
 {
-	// TODO: Write this.
-	return false;
+	const std::vector<Vector3>& vertexArray = this->mesh.GetVertexArray();
+	if (vertexArray.size() == 0)
+		return false;
+
+	boundingBox.min = this->position;
+	boundingBox.max = this->position;
+
+	for (const Vector3& localVertex : vertexArray)
+	{
+		Vector3 worldVertex = this->position + this->orientation * localVertex;
+		boundingBox.ExpandToIncludePoint(worldVertex);
+	}
+	
+	return true;
 }
