@@ -6,8 +6,7 @@ namespace PhysicsEngine
 {
 	class Simulation;
 
-	// Examples of derivatives of this class include particles, springs, rigid-bodies, etc.,
-	// as well as various types of forces.  Anything the simulation tracks derives from this.
+	// These are anything the simulation tracks.
 	class PHYSICS_ENGINE_API PhysicsObject
 	{
 		friend class Simulation;

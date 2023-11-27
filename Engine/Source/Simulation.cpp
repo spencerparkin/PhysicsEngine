@@ -15,6 +15,7 @@ Simulation::Simulation()
 	this->currentTime = 0.0;
 	this->maxDeltaTime = 0.5;
 	this->maxTimeStepSize = 0.0025;
+	this->collisionTimeTolerance = 0.0005;
 }
 
 /*virtual*/ Simulation::~Simulation()
@@ -112,7 +113,29 @@ void Simulation::Tick()
 		}
 		else
 		{
-			// TODO: Do a binary search for the exact time of collision up to a given tolerance.
+			// Do a binary search for the precise time of collision up to the configured tolerance.
+			double timeA = this->currentTime;
+			double timeB = this->currentTime + timeStep;
+			while (timeB - timeA > this->collisionTimeTolerance)
+			{
+				double midTime = (timeA + timeB) / 2.0;
+				timeStep = (timeB - timeA) / 2.0;
+				nextState = currentState + currentStateDerivative * timeStep;
+				this->FromStateVector(nextState);
+				if (this->InterpenetrationDetected())
+					timeB = midTime;
+				else
+				{
+					timeA = midTime;
+					currentState = nextState;
+					this->ToStateVectorDerivative(currentStateDerivative);
+				}
+			}
+
+			// This is the approximate time of our collision.
+			this->currentTime = timeB;
+
+			// TODO: Resolve the collision, then let regular integration resume.
 		}
 	}
 }
