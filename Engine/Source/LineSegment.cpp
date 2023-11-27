@@ -51,10 +51,14 @@ Vector3 LineSegment::Lerp(double alpha) const
 	if (::isinf(scale) || ::isnan(scale))
 		return false;
 
+	// This is how we would check that the lines intersect at all, but it may be better
+	// to do the epsilon bounds check against intersection points found on A and B as below.
+#if 0
 	// Verify that the 4 points are coplanar to within the given epsilon.
 	Vector3 vector = numeratorVectorNormalized.CrossProduct(denominatorVectorNormalized);
 	if (vector.Length() > eps)
 		return false;
+#endif
 
 	// Make sure the lerp-alpha is approximately in the range [0,1].
 	double alpha = -numerator / denominator;
