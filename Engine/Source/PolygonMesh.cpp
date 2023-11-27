@@ -34,7 +34,12 @@ void PolygonMesh::Clear()
 
 PolygonMesh* PolygonMesh::Clone() const
 {
-	return nullptr;
+	PolygonMesh* mesh = new PolygonMesh();
+	for (const Vector3& vertex : *this->vertexArray)
+		mesh->vertexArray->push_back(vertex);
+	for (const Polygon* polygon : *this->polygonArray)
+		mesh->polygonArray->push_back(polygon->Clone());
+	return mesh;
 }
 
 bool PolygonMesh::GenerateConvexHull(const std::vector<Vector3>& pointArray)
@@ -398,6 +403,14 @@ PolygonMesh::Polygon::Polygon()
 void PolygonMesh::Polygon::Clear()
 {
 	this->vertexArray->clear();
+}
+
+PolygonMesh::Polygon* PolygonMesh::Polygon::Clone() const
+{
+	Polygon* polygon = new Polygon();
+	for (int i : *this->vertexArray)
+		polygon->vertexArray->push_back(i);
+	return polygon;
 }
 
 int PolygonMesh::Polygon::GetNumVertices() const

@@ -195,7 +195,7 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 {
 	const RigidBody* rigidBody = dynamic_cast<const RigidBody*>(physicalObject);
 	if (!rigidBody)
-		return CollisionResult::UNKNOWN;
+		return CollisionResult::TRY_OTHER_WAY;
 
 	int i = this->FindFaceDividingThisAgainst(rigidBody);
 	if (i >= 0)
@@ -252,11 +252,11 @@ int RigidBody::FindFaceDividingThisAgainst(const RigidBody* rigidBody) const
 	return true;
 }
 
-/*virtual*/ bool RigidBody::ResolveCollisionWith(const PhysicalObject* physicalObject)
+/*virtual*/ PhysicalObject::CollisionResolution RigidBody::ResolveCollisionWith(const PhysicalObject* physicalObject)
 {
 	const RigidBody* rigidBody = dynamic_cast<const RigidBody*>(physicalObject);
 	if (!rigidBody)
-		return false;
+		return CollisionResolution::TRY_OTHER_WAY;
 
 	auto meshA = std::shared_ptr<PolygonMesh>(this->mesh.Clone());
 	auto meshB = std::shared_ptr<PolygonMesh>(rigidBody->mesh.Clone());
@@ -271,7 +271,7 @@ int RigidBody::FindFaceDividingThisAgainst(const RigidBody* rigidBody) const
 	// This shouldn't happen since we shouldn't be called unless the calling
 	// code is sure that we're in collision with the given object.
 	if (contactPointArray.size() == 0)
-		return false;
+		return CollisionResolution::FAILED;
 
 	if (contactPointArray.size() == 1)
 	{
@@ -281,8 +281,8 @@ int RigidBody::FindFaceDividingThisAgainst(const RigidBody* rigidBody) const
 	{
 		// TODO: Punt for now on the case of two or more contact points.  I'll revisit this
 		//       case after I've solved the case of just a single contact point.
-		return false;
+		return CollisionResolution::FAILED;
 	}
 
-	return true;
+	return CollisionResolution::FAILED;
 }

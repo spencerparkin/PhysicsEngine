@@ -16,9 +16,16 @@ namespace PhysicsEngine
 
 		enum class CollisionResult
 		{
-			UNKNOWN,
+			TRY_OTHER_WAY,
 			IN_COLLISION,
 			NOT_IN_COLLISION
+		};
+
+		enum class CollisionResolution
+		{
+			TRY_OTHER_WAY,
+			FAILED,
+			SUCCEEDED
 		};
 
 		virtual double GetMass() const = 0;
@@ -30,7 +37,7 @@ namespace PhysicsEngine
 		virtual void CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const;
 		virtual void ZeroNetForcesAndTorques();
 		virtual CollisionResult IsInCollsionWith(const PhysicalObject* physicalObject) const;
-		virtual bool ResolveCollisionWith(const PhysicalObject* physicalObject);
+		virtual CollisionResolution ResolveCollisionWith(const PhysicalObject* physicalObject);
 		virtual bool GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const;
 	};
 }

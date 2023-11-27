@@ -178,7 +178,7 @@ void Simulation::ForAllCollisionPairs(CollisionPairFunc collisionPairFunc)
 				continue;
 
 			PhysicalObject::CollisionResult result = objectA->IsInCollsionWith(objectB);
-			if (result == PhysicalObject::CollisionResult::UNKNOWN)
+			if (result == PhysicalObject::CollisionResult::TRY_OTHER_WAY)
 				result = objectB->IsInCollsionWith(objectA);	// If object A didn't know, deligate to object B.
 
 			if (result != PhysicalObject::CollisionResult::IN_COLLISION)
@@ -233,6 +233,7 @@ void Simulation::ResolveCollision(PhysicalObject* objectA, PhysicalObject* objec
 	// determine how they are in collision and then what to do about it.
 
 	// Deligate this work to the objects themselves.
-	if (!objectA->ResolveCollisionWith(objectB))
-		objectB->ResolveCollisionWith(objectA);
+	PhysicalObject::CollisionResolution resolution = objectA->ResolveCollisionWith(objectB);
+	if (resolution == PhysicalObject::CollisionResolution::TRY_OTHER_WAY)
+		resolution = objectB->ResolveCollisionWith(objectA);
 }

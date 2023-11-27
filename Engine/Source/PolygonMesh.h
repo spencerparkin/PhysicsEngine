@@ -24,6 +24,7 @@ namespace PhysicsEngine
 			virtual ~Polygon();
 
 			void Clear();
+			Polygon* Clone() const;
 			Polygon* MergeWith(const Polygon* polygon, const std::vector<Vector3>& pointArray) const;
 			bool IsCoplanarWith(const Polygon* polygon, const std::vector<Vector3>& pointArray) const;
 			bool IsCoplanar(const std::vector<Vector3>& pointArray) const;
