@@ -17,6 +17,7 @@
 #include <math.h>
 #include <time.h>
 #include <memory>
+#include <assert.h>
 
 #define PHY_ENG_SMALL_EPS		1e-6
 #define PHY_ENG_FAT_EPS			1e-4

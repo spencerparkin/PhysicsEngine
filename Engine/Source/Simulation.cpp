@@ -144,12 +144,6 @@ void Simulation::Tick()
 				this->ResolveCollision(objectA, objectB);
 				return true;
 			});
-
-			// DEBUG CODE!
-#if 1
-			this->tickEnabled = false;
-			return;
-#endif
 		}
 	}
 }

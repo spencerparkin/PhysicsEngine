@@ -40,7 +40,7 @@ PhysicalObject::PhysicalObject()
 	return CollisionResult::TRY_OTHER_WAY;
 }
 
-/*virtual*/ PhysicalObject::CollisionResolution PhysicalObject::ResolveCollisionWith(const PhysicalObject* physicalObject)
+/*virtual*/ PhysicalObject::CollisionResolution PhysicalObject::ResolveCollisionWith(PhysicalObject* physicalObject)
 {
 	return CollisionResolution::TRY_OTHER_WAY;
 }

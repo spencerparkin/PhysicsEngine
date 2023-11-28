@@ -37,7 +37,7 @@ namespace PhysicsEngine
 		virtual void CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const;
 		virtual void ZeroNetForcesAndTorques();
 		virtual CollisionResult IsInCollsionWith(const PhysicalObject* physicalObject) const;
-		virtual CollisionResolution ResolveCollisionWith(const PhysicalObject* physicalObject);
+		virtual CollisionResolution ResolveCollisionWith(PhysicalObject* physicalObject);
 		virtual bool GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const;
 	};
 }
