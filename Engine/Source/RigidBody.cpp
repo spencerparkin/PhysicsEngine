@@ -1,7 +1,6 @@
 #include "RigidBody.h"
 #include "AxisAlignedBoundingBox.h"
 #include "Plane.h"
-#include "VectorN.h"
 
 using namespace PhysicsEngine;
 
@@ -94,63 +93,9 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	this->netTorque = Vector3(0.0, 0.0, 0.0);
 }
 
-/*virtual*/ int RigidBody::GetStateSpaceRequirement() const
-{
-	// 3 for position, 9 for orientation, 3 for linear momentum, and 3 for angular momentum.
-	return 18;
-}
-
-/*virtual*/ void RigidBody::SetStateFromVector(const VectorN& stateVector, int& i)
-{
-	this->position.x = stateVector[i++];
-	this->position.y = stateVector[i++];
-	this->position.z = stateVector[i++];
-
-	for (int r = 0; r < 3; r++)
-		for (int c = 0; c < 3; c++)
-			this->orientation.ele[r][c] = stateVector[i++];
-
-	this->orientation.Orthonormalize();
-
-	this->linearMomentum.x = stateVector[i++];
-	this->linearMomentum.y = stateVector[i++];
-	this->linearMomentum.z = stateVector[i++];
-
-	this->angularMomentum.x = stateVector[i++];
-	this->angularMomentum.y = stateVector[i++];
-	this->angularMomentum.z = stateVector[i++];
-}
-
-/*virtual*/ void RigidBody::GetStateToVector(VectorN& stateVector, int& i) const
-{
-	stateVector[i++] = this->position.x;
-	stateVector[i++] = this->position.y;
-	stateVector[i++] = this->position.z;
-
-	const_cast<RigidBody*>(this)->orientation.Orthonormalize();
-
-	for (int r = 0; r < 3; r++)
-		for (int c = 0; c < 3; c++)
-			stateVector[i++] = this->orientation.ele[r][c];
-
-	stateVector[i++] = this->linearMomentum.x;
-	stateVector[i++] = this->linearMomentum.y;
-	stateVector[i++] = this->linearMomentum.z;
-
-	stateVector[i++] = this->angularMomentum.x;
-	stateVector[i++] = this->angularMomentum.y;
-	stateVector[i++] = this->angularMomentum.z;
-}
-
-/*virtual*/ void RigidBody::CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const
+/*virtual*/ void RigidBody::Integrate(double deltaTime)
 {
 	Vector3 velocity = this->linearMomentum / this->mass;
-
-	stateVectorDerivative[i++] = velocity.x;
-	stateVectorDerivative[i++] = velocity.y;
-	stateVectorDerivative[i++] = velocity.z;
-
-	const_cast<RigidBody*>(this)->orientation.Orthonormalize();
 
 	Matrix3x3 orientationInv(this->orientation);
 	orientationInv.Transpose();
@@ -163,17 +108,12 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 
 	Matrix3x3 orientationDerivative = angularVelocityMatrix * this->orientation;
 
-	for (int r = 0; r < 3; r++)
-		for (int c = 0; c < 3; c++)
-			stateVectorDerivative[i++] = orientationDerivative.ele[r][c];
+	this->linearMomentum += this->netForce * deltaTime;
+	this->angularMomentum += this->netTorque * deltaTime;
+	this->position += velocity * deltaTime;
+	this->orientation += orientationDerivative * deltaTime;
 
-	stateVectorDerivative[i++] = this->netForce.x;
-	stateVectorDerivative[i++] = this->netForce.y;
-	stateVectorDerivative[i++] = this->netForce.z;
-
-	stateVectorDerivative[i++] = this->netTorque.x;
-	stateVectorDerivative[i++] = this->netTorque.y;
-	stateVectorDerivative[i++] = this->netTorque.z;
+	this->orientation.Orthonormalize();
 }
 
 /*virtual*/ double RigidBody::GetMass() const

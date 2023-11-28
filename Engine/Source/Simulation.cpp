@@ -3,7 +3,6 @@
 #include "PhysicalObject.h"
 #include "ConceptObject.h"
 #include "AxisAlignedBoundingBox.h"
-#include "VectorN.h"
 
 using namespace PhysicsEngine;
 
@@ -82,32 +81,21 @@ void Simulation::Tick()
 			this->conceptObjectArray->push_back(conceptObject);
 	}
 
-	// TODO: I don't think we really need this N-vector thing.  Should probably ditch it.
-	
-	// Determine how much space we need in our state vector.
-	VectorN currentState;
-	int N = 0;
-	for (PhysicalObject* physicalObject : *this->physicalObjectArray)
-		N += physicalObject->GetStateSpaceRequirement();
-	currentState.SetDimension(N);
-
-	// We assume each tick begins with no two physical objects interpenetrating.
-	// Note that a more sophisticated system would abstract the notion of what
-	// kind of integration technique we're using here, but I'm just going to use
-	// Euler integration here for the sake of simplicity.  Maybe that will be
-	// good enough?
-	this->ToStateVector(currentState);
 	while (this->currentTime < presentTime)
 	{
-		VectorN currentStateDerivative(currentState.GetDimension());
-		this->ToStateVectorDerivative(currentStateDerivative);
+		for (PhysicalObject* physicalObject : *this->physicalObjectArray)
+			physicalObject->ZeroNetForcesAndTorques();
+
+		for (ConceptObject* conceptObject : *this->conceptObjectArray)
+			conceptObject->ApplyForcesAndTorques(this, this->currentTime);
 
 		double timeStep = this->maxTimeStepSize;
 		if (this->currentTime + timeStep > presentTime)
 			timeStep = presentTime - this->currentTime;
 
-		currentState += currentStateDerivative * timeStep;
-		this->FromStateVector(currentState);
+		for (PhysicalObject* physicalObject : *this->physicalObjectArray)
+			physicalObject->Integrate(timeStep);
+
 		this->currentTime += timeStep;
 
 		if (this->InterpenetrationDetected())
@@ -170,33 +158,6 @@ void Simulation::ForAllCollisionPairs(CollisionPairFunc collisionPairFunc)
 				return;
 		}
 	}
-}
-
-void Simulation::ToStateVector(VectorN& stateVector) const
-{
-	int i = 0;
-	for (const PhysicalObject* physicalObject : *this->physicalObjectArray)
-		physicalObject->GetStateToVector(stateVector, i);
-}
-
-void Simulation::FromStateVector(const VectorN& stateVector)
-{
-	int i = 0;
-	for (PhysicalObject* physicalObject : *this->physicalObjectArray)
-		physicalObject->SetStateFromVector(stateVector, i);
-}
-
-void Simulation::ToStateVectorDerivative(VectorN& stateVectorDerivative)
-{
-	for (PhysicalObject* physicalObject : *this->physicalObjectArray)
-		physicalObject->ZeroNetForcesAndTorques();
-
-	for (ConceptObject* conceptObject : *this->conceptObjectArray)
-		conceptObject->ApplyForcesAndTorques(this, this->currentTime);
-
-	int i = 0;
-	for (const PhysicalObject* physicalObject : *this->physicalObjectArray)
-		physicalObject->CalcStateDerivatives(stateVectorDerivative, i);
 }
 
 PhysicsObject* Simulation::FindPhysicsObject(const std::string& name)

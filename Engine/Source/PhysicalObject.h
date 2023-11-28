@@ -31,11 +31,8 @@ namespace PhysicsEngine
 		virtual double GetMass() const = 0;
 		virtual void AccumulateForce(const Vector3& force) = 0;
 		virtual void AccumulateTorque(const Vector3& torque);
-		virtual int GetStateSpaceRequirement() const;
-		virtual void SetStateFromVector(const VectorN& stateVector, int& i);
-		virtual void GetStateToVector(VectorN& stateVector, int& i) const;
-		virtual void CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const;
 		virtual void ZeroNetForcesAndTorques();
+		virtual void Integrate(double deltaTime);
 		virtual CollisionResult IsInCollsionWith(const PhysicalObject* physicalObject) const;
 		virtual CollisionResolution ResolveCollisionWith(const PhysicalObject* physicalObject);
 		virtual bool GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const;

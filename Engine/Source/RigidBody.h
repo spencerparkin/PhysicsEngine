@@ -35,13 +35,10 @@ namespace PhysicsEngine
 		void SetOrientation(const Matrix3x3& orientation) { this->orientation = orientation; }
 
 		virtual void ZeroNetForcesAndTorques() override;
+		virtual void Integrate(double deltaTime) override;
 		virtual double GetMass() const override;
 		virtual void AccumulateForce(const Vector3& force) override;
 		virtual void AccumulateTorque(const Vector3& torque) override;
-		virtual int GetStateSpaceRequirement() const override;
-		virtual void SetStateFromVector(const VectorN& stateVector, int& i) override;
-		virtual void GetStateToVector(VectorN& stateVector, int& i) const override;
-		virtual void CalcStateDerivatives(VectorN& stateVectorDerivative, int& i) const override;
 		virtual CollisionResult IsInCollsionWith(const PhysicalObject* physicalObject) const override;
 		virtual CollisionResolution ResolveCollisionWith(const PhysicalObject* physicalObject) override;
 		virtual bool GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const override;

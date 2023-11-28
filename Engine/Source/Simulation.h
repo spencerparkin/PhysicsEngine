@@ -39,10 +39,6 @@ namespace PhysicsEngine
 
 	private:
 
-		void ToStateVector(VectorN& stateVector) const;
-		void FromStateVector(const VectorN& stateVector);
-		void ToStateVectorDerivative(VectorN& stateVectorDerivative);
-
 		bool InterpenetrationDetected() const;
 		void ResolveCollision(PhysicalObject* objectA, PhysicalObject* objectB);
 

@@ -40,9 +40,6 @@
     <ClInclude Include="Source\RigidBody.h">
       <Filter>Source\PhysicsObjects</Filter>
     </ClInclude>
-    <ClInclude Include="Source\VectorN.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Gravity.h">
       <Filter>Source\PhysicsObjects</Filter>
     </ClInclude>
@@ -89,9 +86,6 @@
     </ClCompile>
     <ClCompile Include="Source\RigidBody.cpp">
       <Filter>Source\PhysicsObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\VectorN.cpp">
-      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Gravity.cpp">
       <Filter>Source\PhysicsObjects</Filter>
