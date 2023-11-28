@@ -16,6 +16,13 @@ namespace PhysicsEngine
 		PolygonMesh();
 		virtual ~PolygonMesh();
 
+		struct Edge
+		{
+			int i, j;
+
+			uint64_t CalcKey() const;
+		};
+
 		class PHYSICS_ENGINE_API Polygon
 		{
 			friend class PolygonMesh;
@@ -30,6 +37,7 @@ namespace PhysicsEngine
 			bool IsCoplanarWith(const Polygon* polygon) const;
 			bool IsCoplanar() const;
 			bool HasVertex(int i) const;
+			bool HasEdge(const Edge& edge) const;
 			bool AllPointsOnPlane(const Plane& plane) const;
 			bool MakePlane(Plane& plane) const;
 			int GetNumVertices() const;
@@ -38,18 +46,12 @@ namespace PhysicsEngine
 			bool IntersectedBy(const LineSegment& lineSegment, Vector3& intersectionPoint, double thickness = PHY_ENG_SMALL_EPS) const;
 			PolygonMesh* GetMesh() { return this->mesh; }
 			const PolygonMesh* GetMesh() const { return this->mesh; }
+			bool ContainsPoint(const Vector3& point, double thickness = PHY_ENG_SMALL_EPS) const;
 
 		private:
 			PolygonMesh* mesh;
 			mutable Plane* cachedPlane;
 			std::vector<int>* vertexArray;
-		};
-
-		struct Edge
-		{
-			int i, j;
-
-			uint64_t CalcKey() const;
 		};
 
 		void Clear();
@@ -63,9 +65,11 @@ namespace PhysicsEngine
 		const Polygon* GetPolygon(int i) const;
 		const std::vector<Vector3>& GetVertexArray() const { return *this->vertexArray; }
 		bool CalcCenter(Vector3& center) const;
-		void GenerateEdgeArray(std::vector<Edge>& edgeArray) const;
+		void GenerateEdgeArray(std::vector<Edge>& edgeArray) const;	// TODO: This should be cached for speed.
 		static bool ConvexHullsIntersect(const PolygonMesh& meshA, const PolygonMesh& meshB, std::vector<Vector3>* contactPointArray = nullptr);		// This assumes both meshes are convex hulls.
 		bool EdgeStrikesFaceOf(const PolygonMesh& mesh, std::vector<Vector3>* contactPointArray = nullptr) const;
+		void FindAllFacesSharingVertex(int i, std::vector<const Polygon*>& polygonArray) const;
+		void FindAllFacesSharingEdge(const Edge& edge, std::vector<const Polygon*>& polygonArray) const;
 
 	private:
 

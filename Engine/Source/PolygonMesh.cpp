@@ -322,8 +322,8 @@ bool PolygonMesh::CalcCenter(Vector3& center) const
 		bool mergedPoint = false;
 		for (Vector3& existingPoint : *contactPointArray)
 		{
-			double distance = (point - existingPoint).Length();
-			if (distance < PHY_ENG_FAT_EPS)
+			double squareDistance = (point - existingPoint).InnerProduct(point - existingPoint);
+			if (squareDistance < PHY_ENG_OBESE_EPS * PHY_ENG_OBESE_EPS)
 			{
 				existingPoint = (existingPoint + point) / 2.0;
 				mergedPoint = true;
@@ -391,6 +391,20 @@ uint64_t PolygonMesh::Edge::CalcKey() const
 		return uint64_t(this->j) | (uint64_t(this->i) << 32);
 
 	return uint64_t(this->i) | (uint64_t(this->j) << 32);
+}
+
+void PolygonMesh::FindAllFacesSharingVertex(int i, std::vector<const Polygon*>& polygonArray) const
+{
+	for (const Polygon* polygon : *this->polygonArray)
+		if (polygon->HasVertex(i))
+			polygonArray.push_back(polygon);
+}
+
+void PolygonMesh::FindAllFacesSharingEdge(const Edge& edge, std::vector<const Polygon*>& polygonArray) const
+{
+	for (const Polygon* polygon : *this->polygonArray)
+		if (polygon->HasEdge(edge))
+			polygonArray.push_back(polygon);
 }
 
 //------------------------------------ PolygonMesh::Polygon ------------------------------------
@@ -599,12 +613,37 @@ bool PolygonMesh::Polygon::HasVertex(int i) const
 	return false;
 }
 
+bool PolygonMesh::Polygon::HasEdge(const Edge& edge) const
+{
+	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
+	{
+		int j = (i + 1) % this->vertexArray->size();
+
+		if (edge.i == (*this->vertexArray)[i] && edge.j == (*this->vertexArray)[j])
+			return true;
+
+		if (edge.j == (*this->vertexArray)[i] && edge.i == (*this->vertexArray)[j])
+			return true;
+	}
+
+	return false;
+}
+
 bool PolygonMesh::Polygon::IntersectedBy(const LineSegment& lineSegment, Vector3& intersectionPoint, double thickness /*= PHY_ENG_SMALL_EPS*/) const
 {
 	Plane polygonPlane;
 	this->MakePlane(polygonPlane);
+
 	if (!lineSegment.IntersectWith(polygonPlane, intersectionPoint, thickness))
 		return false;
+
+	return this->ContainsPoint(intersectionPoint, thickness);
+}
+
+bool PolygonMesh::Polygon::ContainsPoint(const Vector3& point, double thickness /*= PHY_ENG_SMALL_EPS*/) const
+{
+	Plane polygonPlane;
+	this->MakePlane(polygonPlane);
 
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
 	{
@@ -616,7 +655,7 @@ bool PolygonMesh::Polygon::IntersectedBy(const LineSegment& lineSegment, Vector3
 		Vector3 edgeNormal = (edgePointB - edgePointA).CrossProduct(polygonPlane.normal);
 		Plane edgePlane(edgePointA, edgeNormal);
 
-		if (edgePlane.WhichSide(intersectionPoint, thickness) == Plane::Side::FRONT)
+		if (edgePlane.WhichSide(point, thickness) == Plane::Side::FRONT)
 			return false;
 	}
 

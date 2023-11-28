@@ -45,6 +45,16 @@ namespace PhysicsEngine
 
 	private:
 
+		enum class ContactPointClassification
+		{
+			UNKNOWN,
+			FACE_INTERIOR,
+			EDGE_INTERIOR,
+			VERTEX
+		};
+
+		ContactPointClassification ClassifyContactPoint(const Vector3& contactPoint, const PolygonMesh& mesh, Vector3& normal, Vector3& tangent);
+
 		double mass;
 		PolygonMesh mesh;
 		Matrix3x3 bodySpaceInertiaTensor;

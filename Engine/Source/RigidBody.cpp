@@ -1,6 +1,7 @@
 #include "RigidBody.h"
 #include "AxisAlignedBoundingBox.h"
 #include "Plane.h"
+#include "LineSegment.h"
 
 using namespace PhysicsEngine;
 
@@ -183,7 +184,86 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	PolygonMesh::ConvexHullsIntersect(*meshA, *meshB, &contactPointArray);
 
 	std::vector<Vector3> contactNormalArray;
-	// TODO: Classify the contact points so that we can assign contact normals.
+
+	for (const Vector3& contactPoint : contactPointArray)
+	{
+		Vector3 normalA, tangentA;
+		Vector3 normalB, tangentB;
+
+		ContactPointClassification classificationA = this->ClassifyContactPoint(contactPoint, *meshA, normalA, tangentA);	
+		ContactPointClassification classificationB = this->ClassifyContactPoint(contactPoint, *meshB, normalB, tangentB);
+		
+		if (classificationA == ContactPointClassification::UNKNOWN || classificationB == ContactPointClassification::UNKNOWN)
+			return CollisionResolution::FAILED;
+
+		Vector3 contactNormal;
+
+		switch (classificationA)
+		{
+			case ContactPointClassification::VERTEX:
+			{
+				switch (classificationB)
+				{
+				case ContactPointClassification::VERTEX:
+					contactNormal = normalB - normalA;	// Not so sure about this, but it is a rare case.
+					contactNormal.Normalize();
+					break;
+				case ContactPointClassification::EDGE_INTERIOR:
+				case ContactPointClassification::FACE_INTERIOR:
+					contactNormal = normalB;
+					break;
+				}
+				break;
+			}
+			case ContactPointClassification::EDGE_INTERIOR:
+			{
+				switch (classificationB)
+				{
+				case ContactPointClassification::VERTEX:
+					contactNormal = normalA;
+					break;
+				case ContactPointClassification::EDGE_INTERIOR:
+					contactNormal = tangentA.CrossProduct(tangentB);
+					contactNormal.Normalize();
+					break;
+				case ContactPointClassification::FACE_INTERIOR:
+					return CollisionResolution::FAILED;
+				}
+				break;
+			}
+			case ContactPointClassification::FACE_INTERIOR:
+			{
+				switch (classificationB)
+				{
+				case ContactPointClassification::VERTEX:
+					contactNormal = normalA;
+					break;
+				case ContactPointClassification::EDGE_INTERIOR:
+				case ContactPointClassification::FACE_INTERIOR:
+					return CollisionResolution::FAILED;
+				}
+				break;
+			}
+		}
+
+		contactNormalArray.push_back(contactNormal);
+	}
+
+	// Lastly, before we can use the contact normals, we need them to all face a consistent direction.
+	// By convention, we'll have them all face away from the given rigid body.  Our method here isn't
+	// fool-proof, but will it work well enough?
+	Vector3 center = rigidBody->position;
+	for (int i = 0; i < (signed)contactPointArray.size(); i++)
+	{
+		const Vector3& point = contactPointArray[i];
+		Vector3& normal = contactNormalArray[i];
+		Vector3 vectorA = (point + normal * PHY_ENG_OBESE_EPS) - center;
+		Vector3 vectorB = (point - normal * PHY_ENG_OBESE_EPS) - center;
+		double squareDistanceA = vectorA.InnerProduct(vectorA);
+		double squareDistanceB = vectorB.InnerProduct(vectorB);
+		if (squareDistanceA < squareDistanceB)
+			normal = -normal;
+	}
 
 	// If they are not touching one another, there is nothing for us to do.
 	// This shouldn't happen since we shouldn't be called unless the calling
@@ -193,7 +273,7 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 
 	if (contactPointArray.size() == 1)
 	{
-		//...
+		// TODO: Apply impulse here.
 	}
 	else
 	{
@@ -203,4 +283,67 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	}
 
 	return CollisionResolution::FAILED;
+}
+
+RigidBody::ContactPointClassification RigidBody::ClassifyContactPoint(const Vector3& contactPoint, const PolygonMesh& mesh, Vector3& normal, Vector3& tangent)
+{
+	for (int i = 0; i < (signed)mesh.GetVertexArray().size(); i++)
+	{
+		const Vector3& vertex = mesh.GetVertexArray()[i];
+		double distance = (vertex - contactPoint).Length();
+		if (distance < PHY_ENG_FAT_EPS)
+		{
+			std::vector<const PolygonMesh::Polygon*> polygonArray;
+			mesh.FindAllFacesSharingVertex(i, polygonArray);
+			normal = Vector3(0.0, 0.0, 0.0);
+			for (const PolygonMesh::Polygon* polygon : polygonArray)
+			{
+				Plane plane;
+				polygon->MakePlane(plane);
+				normal += plane.normal;
+			}
+			normal.Normalize();
+			tangent = Vector3(0.0, 0.0, 0.0);
+			return ContactPointClassification::VERTEX;
+		}
+	}
+
+	std::vector<PolygonMesh::Edge> edgeArray;
+	mesh.GenerateEdgeArray(edgeArray);
+	for (const PolygonMesh::Edge& edge : edgeArray)
+	{
+		LineSegment edgeSegment;
+		edgeSegment.pointA = mesh.GetVertexArray()[edge.i];
+		edgeSegment.pointB = mesh.GetVertexArray()[edge.j];
+		if (edgeSegment.ContainsPoint(contactPoint, PHY_ENG_FAT_EPS))
+		{
+			std::vector<const PolygonMesh::Polygon*> polygonArray;
+			mesh.FindAllFacesSharingEdge(edge, polygonArray);
+			normal = Vector3(0.0, 0.0, 0.0);
+			for (const PolygonMesh::Polygon* polygon : polygonArray)
+			{
+				Plane plane;
+				polygon->MakePlane(plane);
+				normal += plane.normal;
+			}
+			normal.Normalize();
+			tangent = edgeSegment.pointB - edgeSegment.pointA;
+			return ContactPointClassification::EDGE_INTERIOR;
+		}
+	}
+
+	for (int i = 0; i < (signed)mesh.GetNumPolygons(); i++)
+	{
+		const PolygonMesh::Polygon* polygon = mesh.GetPolygon(i);
+		if (polygon->ContainsPoint(contactPoint, PHY_ENG_FAT_EPS))
+		{
+			Plane plane;
+			polygon->MakePlane(plane);
+			normal = plane.normal;
+			tangent = Vector3(0.0, 0.0, 0.0);
+			return ContactPointClassification::FACE_INTERIOR;
+		}
+	}
+
+	return ContactPointClassification::UNKNOWN;
 }

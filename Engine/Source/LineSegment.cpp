@@ -101,3 +101,11 @@ bool LineSegment::IntersectWith(const Plane& plane, Vector3& intersectionPoint, 
 	intersectionPoint = this->Lerp(alpha);
 	return true;
 }
+
+bool LineSegment::ContainsPoint(const Vector3& point, double thickness /*= PHY_ENG_SMALL_EPS*/) const
+{
+	Vector3 nearestPoint = this->NearestPoint(point);
+	Vector3 difference = nearestPoint - point;
+	double distanceSquared = difference.InnerProduct(difference);
+	return distanceSquared <= thickness * thickness;
+}
