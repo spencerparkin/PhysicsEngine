@@ -8,6 +8,7 @@ namespace PhysicsEngine
 	class Matrix3x3;
 	class Plane;
 	class AxisAlignedBoundingBox;
+	class LineSegment;
 
 	class PHYSICS_ENGINE_API PolygonMesh
 	{
@@ -29,16 +30,37 @@ namespace PhysicsEngine
 			bool IsCoplanarWith(const Polygon* polygon, const std::vector<Vector3>& pointArray) const;
 			bool IsCoplanar(const std::vector<Vector3>& pointArray) const;
 			bool HasVertex(int i) const;
-			bool ContainsVertex(const Vector3& vertex, const std::vector<Vector3>& pointArray, double thickness = PHY_ENG_EPS) const;
+			bool ContainsVertex(const Vector3& vertex, const std::vector<Vector3>& pointArray, double thickness = PHY_ENG_SMALL_EPS) const;
 			bool AllPointsOnPlane(const Plane& plane, const std::vector<Vector3>& pointArray) const;
 			bool MakePlane(Plane& plane, const std::vector<Vector3>& pointArray) const;
 			int GetNumVertices() const;
 			const Vector3& GetVertex(int i, const PolygonMesh& polygonMesh) const;
 			void InvalidateCachedPlane() const;
+			bool IntersectedBy(const LineSegment& lineSegment, const std::vector<Vector3>& pointArray, double thickness = PHY_ENG_SMALL_EPS) const;
 
 		private:
 			mutable Plane* cachedPlane;
 			std::vector<int>* vertexArray;
+		};
+
+		struct Edge
+		{
+			int i, j;
+
+			uint64_t CalcKey() const;
+		};
+
+		struct ContactPoint
+		{
+			enum class Type
+			{
+				VERTEX_TO_FACE,
+				EDGE_TO_EDGE
+			};
+
+			Type type;
+			Vector3 point;
+			Vector3 normal;
 		};
 
 		void Clear();
@@ -52,25 +74,12 @@ namespace PhysicsEngine
 		const Polygon* GetPolygon(int i) const;
 		const std::vector<Vector3>& GetVertexArray() const { return *this->vertexArray; }
 		bool CalcCenter(Vector3& center) const;
-
-		struct Edge
-		{
-			int i, j;
-
-			uint64_t CalcKey() const;
-		};
-
 		void GenerateEdgeArray(std::vector<Edge>& edgeArray) const;
-
-		struct ContactPoint
-		{
-			Vector3 point;
-			Vector3 normal;
-		};
-
+		static bool ConvexHullsIntersect(const PolygonMesh& meshA, const PolygonMesh& meshB);		// This assumes both meshes are convex hulls.
+		bool IntersectedBy(const LineSegment& lineSegment) const;
 		static void CalculateContactPoints(const PolygonMesh& meshA, const PolygonMesh& meshB, std::vector<ContactPoint>& contactPointArray);
 		void GenerateFaceWithVertexContactPoints(const PolygonMesh& mesh, std::vector<ContactPoint>& contactPointArray, double normalSign) const;
-		const Polygon* FindFaceContainingVertex(const Vector3& vertex) const;
+		const Polygon* FindFaceContainingVertex(const Vector3& vertex, double thickness = PHY_ENG_SMALL_EPS) const;
 
 	private:
 

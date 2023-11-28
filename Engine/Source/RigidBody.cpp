@@ -197,41 +197,16 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	if (!rigidBody)
 		return CollisionResult::TRY_OTHER_WAY;
 
-	int i = this->FindFaceDividingThisAgainst(rigidBody);
-	if (i >= 0)
-		return CollisionResult::NOT_IN_COLLISION;
+	auto meshA = std::shared_ptr<PolygonMesh>(this->mesh.Clone());
+	auto meshB = std::shared_ptr<PolygonMesh>(rigidBody->mesh.Clone());
 
-	i = rigidBody->FindFaceDividingThisAgainst(this);
-	if (i >= 0)
-		return CollisionResult::NOT_IN_COLLISION;
+	meshA->Transform(this->position, this->orientation);
+	meshB->Transform(rigidBody->position, rigidBody->orientation);
 
-	return CollisionResult::IN_COLLISION;
-}
+	if (PolygonMesh::ConvexHullsIntersect(*meshA, *meshB))
+		return CollisionResult::IN_COLLISION;
 
-int RigidBody::FindFaceDividingThisAgainst(const RigidBody* rigidBody) const
-{
-	for (int i = 0; i < this->mesh.GetNumPolygons(); i++)
-	{
-		const PolygonMesh::Polygon* polygon = this->mesh.GetPolygon(i);
-		Plane plane;
-		polygon->MakePlane(plane, this->mesh.GetVertexArray());
-		plane.Transform(this->position, this->orientation);
-		bool dividingPlane = true;
-		for (int j = 0; j < (signed)rigidBody->mesh.GetVertexArray().size(); j++)
-		{
-			Vector3 vertex = rigidBody->position + rigidBody->orientation * rigidBody->mesh.GetVertexArray()[j];
-			if (plane.WhichSide(vertex) == Plane::Side::BACK)
-			{
-				dividingPlane = false;
-				break;
-			}
-		}
-
-		if (dividingPlane)
-			return i;
-	}
-
-	return -1;
+	return CollisionResult::NOT_IN_COLLISION;
 }
 
 /*virtual*/ bool RigidBody::GetBoundingBox(AxisAlignedBoundingBox& boundingBox) const

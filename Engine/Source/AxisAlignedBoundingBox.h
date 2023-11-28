@@ -24,9 +24,9 @@ namespace PhysicsEngine
 		void ScaleAboutCenter(double scale);
 
 		bool ContainsBox(const AxisAlignedBoundingBox& aabb) const;
-		bool ContainsPoint(const Vector3& point, double thickness = PHY_ENG_EPS) const;
-		bool ContainsInteriorPoint(const Vector3& point, double thickness = PHY_ENG_EPS) const;
-		bool ContainsPointOnBoundary(const Vector3& point, double thickness = PHY_ENG_EPS) const;
+		bool ContainsPoint(const Vector3& point, double thickness = PHY_ENG_SMALL_EPS) const;
+		bool ContainsInteriorPoint(const Vector3& point, double thickness = PHY_ENG_SMALL_EPS) const;
+		bool ContainsPointOnBoundary(const Vector3& point, double thickness = PHY_ENG_SMALL_EPS) const;
 
 		void ExpandToIncludePoint(const Vector3& point);
 

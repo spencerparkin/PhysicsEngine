@@ -48,8 +48,6 @@ namespace PhysicsEngine
 
 	private:
 
-		int FindFaceDividingThisAgainst(const RigidBody* rigidBody) const;
-
 		double mass;
 		PolygonMesh mesh;
 		Matrix3x3 bodySpaceInertiaTensor;

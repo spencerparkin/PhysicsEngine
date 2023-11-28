@@ -36,7 +36,7 @@ Vector3 Plane::CalcCenter() const
 	return this->normal * this->D;
 }
 
-Plane::Side Plane::WhichSide(const Vector3& point, double tickness /*= PHY_ENG_EPS*/) const
+Plane::Side Plane::WhichSide(const Vector3& point, double tickness /*= PHY_ENG_SMALL_EPS*/) const
 {
 	double signedDistance = this->SignedDistanceToPoint(point);
 

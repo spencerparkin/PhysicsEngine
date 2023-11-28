@@ -86,7 +86,7 @@ bool AxisAlignedBoundingBox::ContainsBox(const AxisAlignedBoundingBox& aabb) con
 	return this->ContainsPoint(aabb.min) && this->ContainsPoint(aabb.max);
 }
 
-bool AxisAlignedBoundingBox::ContainsPoint(const Vector3& point, double thickness /*= PHY_ENG_EPS*/) const
+bool AxisAlignedBoundingBox::ContainsPoint(const Vector3& point, double thickness /*= PHY_ENG_SMALL_EPS*/) const
 {
 	return (
 		this->min.x - thickness <= point.x && point.x <= this->max.x + thickness &&
@@ -94,7 +94,7 @@ bool AxisAlignedBoundingBox::ContainsPoint(const Vector3& point, double thicknes
 		this->min.z - thickness <= point.z && point.z <= this->max.z + thickness);
 }
 
-bool AxisAlignedBoundingBox::ContainsInteriorPoint(const Vector3& point, double thickness /*= PHY_ENG_EPS*/) const
+bool AxisAlignedBoundingBox::ContainsInteriorPoint(const Vector3& point, double thickness /*= PHY_ENG_SMALL_EPS*/) const
 {
 	return (
 		this->min.x + thickness <= point.x && point.x <= this->max.x - thickness &&
@@ -102,7 +102,7 @@ bool AxisAlignedBoundingBox::ContainsInteriorPoint(const Vector3& point, double 
 		this->min.z + thickness <= point.z && point.z <= this->max.z - thickness);
 }
 
-bool AxisAlignedBoundingBox::ContainsPointOnBoundary(const Vector3& point, double thickness /*= PHY_ENG_EPS*/) const
+bool AxisAlignedBoundingBox::ContainsPointOnBoundary(const Vector3& point, double thickness /*= PHY_ENG_SMALL_EPS*/) const
 {
 	return this->ContainsPoint(point) && !this->ContainsInteriorPoint(point, thickness);
 }

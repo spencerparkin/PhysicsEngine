@@ -38,4 +38,5 @@ private:
 	PhysicsEngine::Vector3 lightPosition;
 	PhysicsEngine::JediForce* jediForce;
 	PhysicsEngine::JediTorque* jediTorque;
+	std::vector<PhysicsEngine::PolygonMesh::ContactPoint> contactPointArray;
 };

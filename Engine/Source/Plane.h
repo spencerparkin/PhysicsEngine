@@ -23,7 +23,7 @@ namespace PhysicsEngine
 
 		double SignedDistanceToPoint(const Vector3& point) const;
 		Vector3 CalcCenter() const;
-		Side WhichSide(const Vector3& point, double tickness = PHY_ENG_EPS) const;
+		Side WhichSide(const Vector3& point, double tickness = PHY_ENG_SMALL_EPS) const;
 		void Transform(const Vector3& translation, const Matrix3x3& rotation);
 
 		Vector3 normal;

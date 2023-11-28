@@ -15,7 +15,6 @@ Simulation::Simulation()
 	this->currentTime = 0.0;
 	this->maxDeltaTime = 0.5;
 	this->maxTimeStepSize = 0.0025;
-	this->collisionTimeTolerance = 0.0005;
 	this->tickEnabled = true;
 }
 
@@ -105,40 +104,14 @@ void Simulation::Tick()
 		if (this->currentTime + timeStep > presentTime)
 			timeStep = presentTime - this->currentTime;
 
-		VectorN nextState(currentState.GetDimension());
-		nextState = currentState + currentStateDerivative * timeStep;
+		currentState += currentStateDerivative * timeStep;
+		this->FromStateVector(currentState);
+		this->currentTime += timeStep;
 
-		this->FromStateVector(nextState);
-
-		if (!this->InterpenetrationDetected())
+		if (this->InterpenetrationDetected())
 		{
-			this->currentTime += timeStep;
-			currentState = nextState;
-		}
-		else
-		{
-			// Do a binary search for the precise time of collision up to the configured tolerance.
-			double timeA = this->currentTime;
-			double timeB = this->currentTime + timeStep;
-			while (timeB - timeA > this->collisionTimeTolerance)
-			{
-				double midTime = (timeA + timeB) / 2.0;
-				timeStep = (timeB - timeA) / 2.0;
-				nextState = currentState + currentStateDerivative * timeStep;
-				this->FromStateVector(nextState);
-				if (this->InterpenetrationDetected())
-					timeB = midTime;
-				else
-				{
-					timeA = midTime;
-					currentState = nextState;
-					this->ToStateVectorDerivative(currentStateDerivative);
-				}
-			}
-
-			currentState += currentStateDerivative * (timeB - timeA);
-			this->FromStateVector(currentState);
-			this->currentTime = timeB;
+			// Note that though penetration is detected, I'm not always generating contact points.
+			// Maybe we need to merge the logic between the two.
 
 			this->ForAllCollisionPairs([this](PhysicalObject* objectA, PhysicalObject* objectB) -> bool {
 				this->ResolveCollision(objectA, objectB);

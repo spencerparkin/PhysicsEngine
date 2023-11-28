@@ -1,4 +1,5 @@
 #include "LineSegment.h"
+#include "Plane.h"
 
 using namespace PhysicsEngine;
 
@@ -27,7 +28,7 @@ Vector3 LineSegment::Lerp(double alpha) const
 	return this->pointA + alpha * (this->pointB - this->pointA);
 }
 
-/*static*/ bool LineSegment::Intersect(const LineSegment& lineSegA, const LineSegment& lineSegB, Vector3& intersectionPoint, double eps /*= PHY_ENG_EPS*/)
+/*static*/ bool LineSegment::Intersect(const LineSegment& lineSegA, const LineSegment& lineSegB, Vector3& intersectionPoint, double eps /*= PHY_ENG_SMALL_EPS*/)
 {
 	Vector3 numeratorVector = (lineSegB.pointB - lineSegB.pointA).CrossProduct(lineSegA.pointA - lineSegB.pointA);
 	Vector3 denominatorVector = (lineSegB.pointB - lineSegB.pointA).CrossProduct(lineSegA.pointB - lineSegB.pointA);
@@ -81,4 +82,22 @@ Vector3 LineSegment::NearestPoint(const Vector3& point) const
 	direction.Normalize();
 	Vector3 nearestPoint = this->pointA + (point - this->pointA).InnerProduct(direction) * direction;
 	return nearestPoint;
+}
+
+bool LineSegment::IntersectWith(const Plane& plane, Vector3& intersectionPoint, double eps /*= PHY_ENG_SMALL_EPS*/) const
+{
+	double numerator = plane.D - this->pointA.InnerProduct(plane.normal);
+	double denominator = (this->pointB - this->pointA).InnerProduct(plane.normal);
+	if (denominator == 0.0)
+		return false;
+
+	double alpha = numerator / denominator;
+	if (::isinf(alpha) || ::isnan(alpha))
+		return false;
+
+	if (alpha < -eps || alpha > 1.0 + eps)
+		return false;
+
+	intersectionPoint = this->Lerp(alpha);
+	return true;
 }

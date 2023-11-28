@@ -3,6 +3,7 @@
 #include "Simulation.h"
 #include "RenderObject.h"
 #include "PhysicsObject.h"
+#include "RigidBody.h"
 #include "Gravity.h"
 #include <gl/GLU.h>
 
@@ -103,6 +104,20 @@ void Canvas::OnPaint(wxPaintEvent& event)
 		if (renderObject)
 			renderObject->Render();
 	}
+
+	glDisable(GL_LIGHTING);
+	glBegin(GL_LINES);
+	glColor3f(1.0f, 0.0f, 0.0f);
+
+	for (const PolygonMesh::ContactPoint& contactPoint : this->contactPointArray)
+	{
+		Vector3 tip = contactPoint.point + contactPoint.normal;
+
+		glVertex2dv(&contactPoint.point.x);
+		glVertex2dv(&tip.x);
+	}
+
+	glEnd();
 
 	glFlush();
 
@@ -253,6 +268,30 @@ void Canvas::OnKeyUp(wxKeyEvent& event)
 			else
 				this->keyboardMode = KeyboardMode::FREE_CAM;
 			break;
+		}
+		case 'c':
+		case 'C':
+		{
+			RigidBody* boxA = dynamic_cast<RigidBody*>(wxGetApp().simulation.FindPhysicsObject("boxA"));
+			RigidBody* boxB = dynamic_cast<RigidBody*>(wxGetApp().simulation.FindPhysicsObject("boxB"));
+			if (boxA && boxB)
+			{
+				PolygonMesh* meshA = boxA->GetMesh().Clone();
+				PolygonMesh* meshB = boxB->GetMesh().Clone();
+
+				meshA->Transform(boxA->GetLocation(), boxA->GetOrientation());
+				meshB->Transform(boxB->GetLocation(), boxB->GetOrientation());
+
+				this->contactPointArray.clear();
+				PolygonMesh::CalculateContactPoints(*meshA, *meshB, this->contactPointArray);
+
+				if (contactPointArray.size() == 0)
+				{
+				}
+
+				delete meshA;
+				delete meshB;
+			}
 		}
 	}
 }
