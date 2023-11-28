@@ -105,19 +105,7 @@ void Canvas::OnPaint(wxPaintEvent& event)
 			renderObject->Render();
 	}
 
-	glDisable(GL_LIGHTING);
-	glBegin(GL_LINES);
-	glColor3f(1.0f, 0.0f, 0.0f);
-
-	for (const PolygonMesh::ContactPoint& contactPoint : this->contactPointArray)
-	{
-		Vector3 tip = contactPoint.point + contactPoint.normal;
-
-		glVertex2dv(&contactPoint.point.x);
-		glVertex2dv(&tip.x);
-	}
-
-	glEnd();
+	// TODO: Maybe continually draw (with no depth test) contact points here for debugging purposes.
 
 	glFlush();
 

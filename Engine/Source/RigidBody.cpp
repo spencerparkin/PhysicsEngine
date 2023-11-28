@@ -179,7 +179,7 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	meshA->Transform(this->position, this->orientation);
 	meshB->Transform(rigidBody->position, rigidBody->orientation);
 
-	std::vector<PolygonMesh::ContactPoint> contactPointArray;
+	std::vector<Vector3> contactPointArray;
 	PolygonMesh::ConvexHullsIntersect(*meshA, *meshB, &contactPointArray);
 
 	// If they are not touching one another, there is nothing for us to do.

@@ -16,12 +16,6 @@ namespace PhysicsEngine
 		PolygonMesh();
 		virtual ~PolygonMesh();
 
-		struct ContactPoint
-		{
-			Vector3 point;
-			Vector3 normal;
-		};
-
 		class PHYSICS_ENGINE_API Polygon
 		{
 			friend class PolygonMesh;
@@ -67,12 +61,10 @@ namespace PhysicsEngine
 		const std::vector<Vector3>& GetVertexArray() const { return *this->vertexArray; }
 		bool CalcCenter(Vector3& center) const;
 		void GenerateEdgeArray(std::vector<Edge>& edgeArray) const;
-		static bool ConvexHullsIntersect(const PolygonMesh& meshA, const PolygonMesh& meshB, std::vector<ContactPoint>* contactPointArray = nullptr);		// This assumes both meshes are convex hulls.
-		bool EdgeStrikesFaceOf(const PolygonMesh& mesh, std::vector<ContactPoint>* contactPointArray = nullptr) const;
+		static bool ConvexHullsIntersect(const PolygonMesh& meshA, const PolygonMesh& meshB, std::vector<Vector3>* contactPointArray = nullptr);		// This assumes both meshes are convex hulls.
+		bool EdgeStrikesFaceOf(const PolygonMesh& mesh, std::vector<Vector3>* contactPointArray = nullptr) const;
 
 	private:
-
-		static void CompressContactPointArray(const std::vector<ContactPoint>& contactPointArray, std::vector<ContactPoint>& compressedContactPointArray);
 
 		struct Triangle
 		{
