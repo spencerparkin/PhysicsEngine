@@ -38,13 +38,17 @@ PolygonMesh* PolygonMesh::Clone() const
 	for (const Vector3& vertex : *this->vertexArray)
 		mesh->vertexArray->push_back(vertex);
 	for (const Polygon* polygon : *this->polygonArray)
-		mesh->polygonArray->push_back(polygon->Clone());
+		mesh->polygonArray->push_back(polygon->Clone(mesh));
 	return mesh;
 }
 
 bool PolygonMesh::GenerateConvexHull(const std::vector<Vector3>& pointArray)
 {
 	this->Clear();
+
+	// This is possibly more points than we really want or need, but we'll address that later.
+	for (const Vector3& point : pointArray)
+		this->vertexArray->push_back(point);
 
 	std::list<Triangle> triangleList;
 
@@ -168,7 +172,7 @@ bool PolygonMesh::GenerateConvexHull(const std::vector<Vector3>& pointArray)
 	std::list<Polygon*> polygonQueue;
 	for (const Triangle& triangle : triangleList)
 	{
-		Polygon* polygon = new Polygon();
+		Polygon* polygon = new Polygon(this);
 		for (int i = 0; i < 3; i++)
 			polygon->vertexArray->push_back(triangle.vertex[i]);
 
@@ -186,7 +190,7 @@ bool PolygonMesh::GenerateConvexHull(const std::vector<Vector3>& pointArray)
 		for (iter = polygonQueue.begin(); iter != polygonQueue.end(); iter++)
 		{
 			Polygon* otherPolygon = *iter;
-			Polygon* mergedPolygon = polygon->MergeWith(otherPolygon, pointArray);
+			Polygon* mergedPolygon = polygon->MergeWith(otherPolygon);
 			if (mergedPolygon)
 			{
 				delete polygon;
@@ -203,6 +207,7 @@ bool PolygonMesh::GenerateConvexHull(const std::vector<Vector3>& pointArray)
 	}
 
 	// Populate the vertex list, but only with the vertices we need.
+	this->vertexArray->clear();
 	std::map<int, int> vertexMap;
 	for (int i = 0; i < (signed)pointArray.size(); i++)
 	{
@@ -230,7 +235,7 @@ bool PolygonMesh::ContainsPoint(const Vector3& point) const
 	for (Polygon* polygon : *this->polygonArray)
 	{
 		Plane plane;
-		polygon->MakePlane(plane, *this->vertexArray);
+		polygon->MakePlane(plane);
 		if (plane.WhichSide(point) == Plane::Side::FRONT)
 			return false;
 	}
@@ -343,13 +348,13 @@ bool PolygonMesh::EdgeStrikesFaceOf(const PolygonMesh& mesh, std::vector<Vector3
 		for (const Polygon* polygon : *mesh.polygonArray)
 		{
 			Vector3 intersectionPoint;
-			if (polygon->IntersectedBy(lineSegment, *mesh.vertexArray, intersectionPoint))
+			if (polygon->IntersectedBy(lineSegment, intersectionPoint))
 			{
 				if (!contactPointArray)
 					return true;
 
 				Plane plane;
-				polygon->MakePlane(plane, *mesh.vertexArray);
+				polygon->MakePlane(plane);
 				contactPointArray->push_back(intersectionPoint);
 			}
 		}
@@ -390,8 +395,9 @@ uint64_t PolygonMesh::Edge::CalcKey() const
 
 //------------------------------------ PolygonMesh::Polygon ------------------------------------
 
-PolygonMesh::Polygon::Polygon()
+PolygonMesh::Polygon::Polygon(PolygonMesh* mesh)
 {
+	this->mesh = mesh;
 	this->vertexArray = new std::vector<int>();
 	this->cachedPlane = nullptr;
 }
@@ -407,9 +413,9 @@ void PolygonMesh::Polygon::Clear()
 	this->vertexArray->clear();
 }
 
-PolygonMesh::Polygon* PolygonMesh::Polygon::Clone() const
+PolygonMesh::Polygon* PolygonMesh::Polygon::Clone(PolygonMesh* mesh) const
 {
-	Polygon* polygon = new Polygon();
+	Polygon* polygon = new Polygon(mesh);
 	for (int i : *this->vertexArray)
 		polygon->vertexArray->push_back(i);
 	return polygon;
@@ -430,9 +436,9 @@ const Vector3& PolygonMesh::Polygon::GetVertex(int i, const PolygonMesh& polygon
 	return (*polygonMesh.vertexArray)[(*this->vertexArray)[i]];
 }
 
-PolygonMesh::Polygon* PolygonMesh::Polygon::MergeWith(const Polygon* polygon, const std::vector<Vector3>& pointArray) const
+PolygonMesh::Polygon* PolygonMesh::Polygon::MergeWith(const Polygon* polygon) const
 {
-	if (!this->IsCoplanarWith(polygon, pointArray))
+	if (!this->IsCoplanarWith(polygon))
 		return nullptr;
 
 	struct Edge
@@ -478,7 +484,7 @@ PolygonMesh::Polygon* PolygonMesh::Polygon::MergeWith(const Polygon* polygon, co
 		return nullptr;
 
 	// Build the merged polygon.
-	Polygon* mergedPolygon = new Polygon();
+	Polygon* mergedPolygon = new Polygon(const_cast<PolygonMesh*>(this->mesh));
 	if (edgeList.size() > 0)
 	{
 		mergedPolygon->vertexArray->push_back((*edgeList.begin()).i);
@@ -510,31 +516,31 @@ PolygonMesh::Polygon* PolygonMesh::Polygon::MergeWith(const Polygon* polygon, co
 	return mergedPolygon;
 }
 
-bool PolygonMesh::Polygon::AllPointsOnPlane(const Plane& plane, const std::vector<Vector3>& pointArray) const
+bool PolygonMesh::Polygon::AllPointsOnPlane(const Plane& plane) const
 {
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
-		if (plane.WhichSide(pointArray[(*this->vertexArray)[i]]) != Plane::Side::NEITHER)
+		if (plane.WhichSide(this->mesh->GetVertexArray()[(*this->vertexArray)[i]]) != Plane::Side::NEITHER)
 			return false;
 
 	return true;
 }
 
-bool PolygonMesh::Polygon::IsCoplanarWith(const Polygon* polygon, const std::vector<Vector3>& pointArray) const
+bool PolygonMesh::Polygon::IsCoplanarWith(const Polygon* polygon) const
 {
 	Plane plane;
-	if (!this->MakePlane(plane, pointArray))
+	if (!this->MakePlane(plane))
 		return false;
 
-	return polygon->AllPointsOnPlane(plane, pointArray);
+	return polygon->AllPointsOnPlane(plane);
 }
 
-bool PolygonMesh::Polygon::IsCoplanar(const std::vector<Vector3>& pointArray) const
+bool PolygonMesh::Polygon::IsCoplanar() const
 {
 	Plane plane;
-	if (!this->MakePlane(plane, pointArray))
+	if (!this->MakePlane(plane))
 		return false;
 
-	return this->AllPointsOnPlane(plane, pointArray);
+	return this->AllPointsOnPlane(plane);
 }
 
 void PolygonMesh::Polygon::InvalidateCachedPlane() const
@@ -543,7 +549,7 @@ void PolygonMesh::Polygon::InvalidateCachedPlane() const
 	this->cachedPlane = nullptr;
 }
 
-bool PolygonMesh::Polygon::MakePlane(Plane& plane, const std::vector<Vector3>& pointArray) const
+bool PolygonMesh::Polygon::MakePlane(Plane& plane) const
 {
 	if (this->cachedPlane)
 	{
@@ -566,7 +572,7 @@ bool PolygonMesh::Polygon::MakePlane(Plane& plane, const std::vector<Vector3>& p
 				triangle.vertex[0] = (*this->vertexArray)[i];
 				triangle.vertex[1] = (*this->vertexArray)[j];
 				triangle.vertex[2] = (*this->vertexArray)[k];
-				double area = triangle.CalcArea(pointArray);
+				double area = triangle.CalcArea(this->mesh->GetVertexArray());
 				if (area > largestArea)
 				{
 					largestArea = area;
@@ -579,7 +585,7 @@ bool PolygonMesh::Polygon::MakePlane(Plane& plane, const std::vector<Vector3>& p
 	if (bestTriangle.vertex[0] == -1)
 		return false;
 
-	bestTriangle.MakePlane(plane, pointArray);
+	bestTriangle.MakePlane(plane, this->mesh->GetVertexArray());
 	*this->cachedPlane = plane;
 	return true;
 }
@@ -593,10 +599,10 @@ bool PolygonMesh::Polygon::HasVertex(int i) const
 	return false;
 }
 
-bool PolygonMesh::Polygon::IntersectedBy(const LineSegment& lineSegment, const std::vector<Vector3>& pointArray, Vector3& intersectionPoint, double thickness /*= PHY_ENG_SMALL_EPS*/) const
+bool PolygonMesh::Polygon::IntersectedBy(const LineSegment& lineSegment, Vector3& intersectionPoint, double thickness /*= PHY_ENG_SMALL_EPS*/) const
 {
 	Plane polygonPlane;
-	this->MakePlane(polygonPlane, pointArray);
+	this->MakePlane(polygonPlane);
 	if (!lineSegment.IntersectWith(polygonPlane, intersectionPoint, thickness))
 		return false;
 
@@ -604,8 +610,8 @@ bool PolygonMesh::Polygon::IntersectedBy(const LineSegment& lineSegment, const s
 	{
 		int j = (i + 1) % this->vertexArray->size();
 
-		const Vector3& edgePointA = pointArray[(*this->vertexArray)[i]];
-		const Vector3& edgePointB = pointArray[(*this->vertexArray)[j]];
+		const Vector3& edgePointA = this->mesh->GetVertexArray()[(*this->vertexArray)[i]];
+		const Vector3& edgePointB = this->mesh->GetVertexArray()[(*this->vertexArray)[j]];
 
 		Vector3 edgeNormal = (edgePointB - edgePointA).CrossProduct(polygonPlane.normal);
 		Plane edgePlane(edgePointA, edgeNormal);

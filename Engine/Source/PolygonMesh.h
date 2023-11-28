@@ -21,23 +21,26 @@ namespace PhysicsEngine
 			friend class PolygonMesh;
 
 		public:
-			Polygon();
+			Polygon(PolygonMesh* mesh);
 			virtual ~Polygon();
 
 			void Clear();
-			Polygon* Clone() const;
-			Polygon* MergeWith(const Polygon* polygon, const std::vector<Vector3>& pointArray) const;
-			bool IsCoplanarWith(const Polygon* polygon, const std::vector<Vector3>& pointArray) const;
-			bool IsCoplanar(const std::vector<Vector3>& pointArray) const;
+			Polygon* Clone(PolygonMesh* mesh) const;
+			Polygon* MergeWith(const Polygon* polygon) const;
+			bool IsCoplanarWith(const Polygon* polygon) const;
+			bool IsCoplanar() const;
 			bool HasVertex(int i) const;
-			bool AllPointsOnPlane(const Plane& plane, const std::vector<Vector3>& pointArray) const;
-			bool MakePlane(Plane& plane, const std::vector<Vector3>& pointArray) const;
+			bool AllPointsOnPlane(const Plane& plane) const;
+			bool MakePlane(Plane& plane) const;
 			int GetNumVertices() const;
 			const Vector3& GetVertex(int i, const PolygonMesh& polygonMesh) const;
 			void InvalidateCachedPlane() const;
-			bool IntersectedBy(const LineSegment& lineSegment, const std::vector<Vector3>& pointArray, Vector3& intersectionPoint, double thickness = PHY_ENG_SMALL_EPS) const;
+			bool IntersectedBy(const LineSegment& lineSegment, Vector3& intersectionPoint, double thickness = PHY_ENG_SMALL_EPS) const;
+			PolygonMesh* GetMesh() { return this->mesh; }
+			const PolygonMesh* GetMesh() const { return this->mesh; }
 
 		private:
+			PolygonMesh* mesh;
 			mutable Plane* cachedPlane;
 			std::vector<int>* vertexArray;
 		};

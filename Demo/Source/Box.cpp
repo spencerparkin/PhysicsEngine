@@ -72,7 +72,7 @@ bool Box::Setup(const Vector3& dimensions, const Vector3& initialPosition)
 		const PolygonMesh::Polygon* polygon = mesh.GetPolygon(i);
 
 		Plane plane;
-		polygon->MakePlane(plane, mesh.GetVertexArray());
+		polygon->MakePlane(plane);
 		const Vector3& localNormal = plane.normal;
 
 		glBegin(GL_POLYGON);
