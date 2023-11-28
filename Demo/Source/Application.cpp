@@ -22,13 +22,13 @@ Application::Application()
 		return false;
 
 	auto boxA = this->simulation.AddPhysicsObject<Box>("boxA");
-	if (!boxA->Setup(Vector3(1.0, 1.5, 2.0), Vector3(-3.0, 0.0, 0.0)))
+	if (!boxA->Setup(Vector3(3.0, 0.5, 0.5), Vector3(-3.0, 0.0, 0.0)))
 	{
 		wxMessageBox("Failed to setup box A!", "Error", wxOK | wxICON_ERROR, nullptr);
 	}
 
 	auto boxB = this->simulation.AddPhysicsObject<Box>("boxB");
-	if (!boxB->Setup(Vector3(0.5, 1.5, 1.8), Vector3(3.0, 0.0, 0.0)))
+	if (!boxB->Setup(Vector3(0.5, 3.0, 3.0), Vector3(3.0, 0.0, 0.0)))
 	{
 		wxMessageBox("Failed to setup box B!", "Error", wxOK | wxICON_ERROR, nullptr);
 	}
