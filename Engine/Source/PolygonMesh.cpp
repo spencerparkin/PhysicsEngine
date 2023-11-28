@@ -294,115 +294,37 @@ bool PolygonMesh::CalcCenter(Vector3& center) const
 	return true;
 }
 
-/*static*/ bool PolygonMesh::ConvexHullsIntersect(const PolygonMesh& meshA, const PolygonMesh& meshB)
+/*static*/ bool PolygonMesh::ConvexHullsIntersect(const PolygonMesh& meshA, const PolygonMesh& meshB, std::vector<ContactPoint>* contactPointArray /*= nullptr*/)
 {
-	std::vector<Edge> edgeArrayA;
-	meshA.GenerateEdgeArray(edgeArrayA);
-	for (const Edge& edge : edgeArrayA)
-	{
-		LineSegment lineSegment(meshA.GetVertexArray()[edge.i], meshA.GetVertexArray()[edge.j]);
-		if (meshB.IntersectedBy(lineSegment))
-			return true;
-	}
-
-	std::vector<Edge> edgeArrayB;
-	meshB.GenerateEdgeArray(edgeArrayB);
-	for (const Edge& edge : edgeArrayB)
-	{
-		LineSegment lineSegment(meshB.GetVertexArray()[edge.i], meshB.GetVertexArray()[edge.j]);
-		if (meshA.IntersectedBy(lineSegment))
-			return true;
-	}
-
-	return false;
+	return meshA.EdgeStrikesFaceOf(meshB, contactPointArray) || meshB.EdgeStrikesFaceOf(meshA, contactPointArray);
 }
 
-bool PolygonMesh::IntersectedBy(const LineSegment& lineSegment) const
+bool PolygonMesh::EdgeStrikesFaceOf(const PolygonMesh& mesh, std::vector<ContactPoint>* contactPointArray /*= nullptr*/) const
 {
-	for (const Polygon* polygon : *this->polygonArray)
-		if (polygon->IntersectedBy(lineSegment, *this->vertexArray))
-			return true;
-
-	return false;
-}
-
-/*static*/ void PolygonMesh::CalculateContactPoints(const PolygonMesh& meshA, const PolygonMesh& meshB, std::vector<ContactPoint>& contactPointArray)
-{
-	contactPointArray.clear();
-
-	// Note that contact normals will always point from A to B.
-	meshA.GenerateFaceWithVertexContactPoints(meshB, contactPointArray, -1.0);
-	meshB.GenerateFaceWithVertexContactPoints(meshA, contactPointArray, 1.0);
-
-	// Note that caching this information with the mesh could provide a speed up.
-	std::vector<Edge> edgeArrayA, edgeArrayB;
-	meshA.GenerateEdgeArray(edgeArrayA);
-	meshB.GenerateEdgeArray(edgeArrayB);
-
-	Vector3 centerA;
-	meshA.CalcCenter(centerA);
-
-	for (const Edge& edgeA : edgeArrayA)
+	std::vector<Edge> edgeArray;
+	this->GenerateEdgeArray(edgeArray);
+	for (const Edge& edge : edgeArray)
 	{
-		LineSegment segA(meshA.GetVertexArray()[edgeA.i], meshA.GetVertexArray()[edgeA.j]);
-
-		for (const Edge& edgeB : edgeArrayB)
+		LineSegment lineSegment(this->GetVertexArray()[edge.i], this->GetVertexArray()[edge.j]);
+		for (const Polygon* polygon : *mesh.polygonArray)
 		{
-			LineSegment segB(meshB.GetVertexArray()[edgeB.i], meshB.GetVertexArray()[edgeB.j]);
-
 			Vector3 intersectionPoint;
-			if (LineSegment::Intersect(segA, segB, intersectionPoint, PHY_ENG_FAT_EPS))
+			if (polygon->IntersectedBy(lineSegment, *mesh.vertexArray, intersectionPoint))
 			{
-				ContactPoint contactPoint;
-				contactPoint.type = ContactPoint::Type::EDGE_TO_EDGE;
-				contactPoint.point = intersectionPoint;
-				contactPoint.normal = (segA.pointB - segA.pointA).CrossProduct(segB.pointB - segB.pointA);
-				contactPoint.normal.Normalize();
-				
-				// Not sure if there's a better way to do this, but...
-				if (((contactPoint.point + contactPoint.normal) - centerA).Length() < ((contactPoint.point - contactPoint.normal) - centerA).Length())
-					contactPoint.normal = -contactPoint.normal;
+				if (!contactPointArray)
+					return true;
 
-				// Don't add the contact point if there is already one at approximately the same location.
-				// Such a point is probably a face-to-face contact point, which may have a more accurate normal.
-				bool addContactPoint = true;
-				for (const ContactPoint& existingContactPoint : contactPointArray)
-				{
-					if ((existingContactPoint.point - contactPoint.point).Length() < PHY_ENG_FAT_EPS)
-					{
-						addContactPoint = false;
-						break;
-					}
-				}
-
-				if (addContactPoint)
-					contactPointArray.push_back(contactPoint);
+				Plane plane;
+				polygon->MakePlane(plane, *mesh.vertexArray);
+				contactPointArray->push_back(ContactPoint{ intersectionPoint, plane.normal });
 			}
 		}
 	}
-}
 
-void PolygonMesh::GenerateFaceWithVertexContactPoints(const PolygonMesh& mesh, std::vector<ContactPoint>& contactPointArray, double normalSign) const
-{
-	for (const Vector3& vertex : *this->vertexArray)
-	{
-		const PolygonMesh::Polygon* polygon = mesh.FindFaceContainingVertex(vertex, PHY_ENG_FAT_EPS);
-		if (polygon)
-		{
-			Plane plane;
-			polygon->MakePlane(plane, mesh.GetVertexArray());
-			contactPointArray.push_back(ContactPoint{ ContactPoint::Type::VERTEX_TO_FACE, vertex, plane.normal * normalSign });
-		}
-	}
-}
+	if (contactPointArray)
+		return contactPointArray->size() > 0;
 
-const PolygonMesh::Polygon* PolygonMesh::FindFaceContainingVertex(const Vector3& vertex, double thickness /*= PHY_ENG_SMALL_EPS*/) const
-{
-	for (const Polygon* polygon : *this->polygonArray)
-		if (polygon->ContainsVertex(vertex, *this->vertexArray, thickness))
-			return polygon;
-
-	return nullptr;
+	return false;
 }
 
 void PolygonMesh::GenerateEdgeArray(std::vector<Edge>& edgeArray) const
@@ -637,11 +559,11 @@ bool PolygonMesh::Polygon::HasVertex(int i) const
 	return false;
 }
 
-bool PolygonMesh::Polygon::ContainsVertex(const Vector3& vertex, const std::vector<Vector3>& pointArray, double thickness /*= PHY_ENG_SMALL_EPS*/) const
+bool PolygonMesh::Polygon::IntersectedBy(const LineSegment& lineSegment, const std::vector<Vector3>& pointArray, Vector3& intersectionPoint, double thickness /*= PHY_ENG_SMALL_EPS*/) const
 {
 	Plane polygonPlane;
 	this->MakePlane(polygonPlane, pointArray);
-	if (polygonPlane.WhichSide(vertex, thickness) != Plane::Side::NEITHER)
+	if (!lineSegment.IntersectWith(polygonPlane, intersectionPoint, thickness))
 		return false;
 
 	for (int i = 0; i < (signed)this->vertexArray->size(); i++)
@@ -654,23 +576,11 @@ bool PolygonMesh::Polygon::ContainsVertex(const Vector3& vertex, const std::vect
 		Vector3 edgeNormal = (edgePointB - edgePointA).CrossProduct(polygonPlane.normal);
 		Plane edgePlane(edgePointA, edgeNormal);
 
-		if (edgePlane.WhichSide(vertex, thickness) == Plane::Side::FRONT)
+		if (edgePlane.WhichSide(intersectionPoint, thickness) == Plane::Side::FRONT)
 			return false;
 	}
 
 	return true;
-}
-
-bool PolygonMesh::Polygon::IntersectedBy(const LineSegment& lineSegment, const std::vector<Vector3>& pointArray, double thickness /*= PHY_ENG_SMALL_EPS*/) const
-{
-	Plane polygonPlane;
-	this->MakePlane(polygonPlane, pointArray);
-
-	Vector3 intersectionPoint;
-	if (!lineSegment.IntersectWith(polygonPlane, intersectionPoint, thickness))
-		return false;
-
-	return this->ContainsVertex(intersectionPoint, pointArray, thickness);
 }
 
 //------------------------------------ PolygonMesh::Triangle ------------------------------------

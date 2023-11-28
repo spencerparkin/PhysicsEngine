@@ -110,9 +110,6 @@ void Simulation::Tick()
 
 		if (this->InterpenetrationDetected())
 		{
-			// Note that though penetration is detected, I'm not always generating contact points.
-			// Maybe we need to merge the logic between the two.
-
 			this->ForAllCollisionPairs([this](PhysicalObject* objectA, PhysicalObject* objectB) -> bool {
 				this->ResolveCollision(objectA, objectB);
 				return true;

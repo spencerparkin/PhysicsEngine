@@ -240,7 +240,9 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	meshB->Transform(rigidBody->position, rigidBody->orientation);
 
 	std::vector<PolygonMesh::ContactPoint> contactPointArray;
-	PolygonMesh::CalculateContactPoints(*meshA, *meshB, contactPointArray);
+	PolygonMesh::ConvexHullsIntersect(*meshA, *meshB, &contactPointArray);
+
+	//...
 
 	// If they are not touching one another, there is nothing for us to do.
 	// This shouldn't happen since we shouldn't be called unless the calling

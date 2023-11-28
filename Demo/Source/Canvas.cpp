@@ -269,30 +269,6 @@ void Canvas::OnKeyUp(wxKeyEvent& event)
 				this->keyboardMode = KeyboardMode::FREE_CAM;
 			break;
 		}
-		case 'c':
-		case 'C':
-		{
-			RigidBody* boxA = dynamic_cast<RigidBody*>(wxGetApp().simulation.FindPhysicsObject("boxA"));
-			RigidBody* boxB = dynamic_cast<RigidBody*>(wxGetApp().simulation.FindPhysicsObject("boxB"));
-			if (boxA && boxB)
-			{
-				PolygonMesh* meshA = boxA->GetMesh().Clone();
-				PolygonMesh* meshB = boxB->GetMesh().Clone();
-
-				meshA->Transform(boxA->GetLocation(), boxA->GetOrientation());
-				meshB->Transform(boxB->GetLocation(), boxB->GetOrientation());
-
-				this->contactPointArray.clear();
-				PolygonMesh::CalculateContactPoints(*meshA, *meshB, this->contactPointArray);
-
-				if (contactPointArray.size() == 0)
-				{
-				}
-
-				delete meshA;
-				delete meshB;
-			}
-		}
 	}
 }
 
