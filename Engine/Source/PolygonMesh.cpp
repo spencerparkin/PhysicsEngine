@@ -296,7 +296,10 @@ bool PolygonMesh::CalcCenter(Vector3& center) const
 
 /*static*/ bool PolygonMesh::ConvexHullsIntersect(const PolygonMesh& meshA, const PolygonMesh& meshB, std::vector<ContactPoint>* contactPointArray /*= nullptr*/)
 {
-	return meshA.EdgeStrikesFaceOf(meshB, contactPointArray) || meshB.EdgeStrikesFaceOf(meshA, contactPointArray);
+	if (meshA.EdgeStrikesFaceOf(meshB, contactPointArray) && !contactPointArray)
+		return true;
+
+	return meshB.EdgeStrikesFaceOf(meshA, contactPointArray);
 }
 
 bool PolygonMesh::EdgeStrikesFaceOf(const PolygonMesh& mesh, std::vector<ContactPoint>* contactPointArray /*= nullptr*/) const
