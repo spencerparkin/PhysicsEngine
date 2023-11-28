@@ -35,6 +35,7 @@
     <ClInclude Include="Source\RigidBody.h" />
     <ClInclude Include="Source\Simulation.h" />
     <ClInclude Include="Source\Vector3.h" />
+    <ClInclude Include="Source\VectorN.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp" />
@@ -52,6 +53,7 @@
     <ClCompile Include="Source\RigidBody.cpp" />
     <ClCompile Include="Source\Simulation.cpp" />
     <ClCompile Include="Source\Vector3.cpp" />
+    <ClCompile Include="Source\VectorN.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

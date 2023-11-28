@@ -2,6 +2,7 @@
 #include "PhysicsObject.h"
 #include "PhysicalObject.h"
 #include "ConceptObject.h"
+#include "VectorN.h"
 #include "AxisAlignedBoundingBox.h"
 
 using namespace PhysicsEngine;
@@ -81,21 +82,30 @@ void Simulation::Tick()
 			this->conceptObjectArray->push_back(conceptObject);
 	}
 
+	// Determine how much space we need in our state vector.
+	VectorN currentState;
+	int N = 0;
+	for (PhysicalObject* physicalObject : *this->physicalObjectArray)
+		N += physicalObject->GetStateSpaceRequirement();
+	currentState.SetDimension(N);
+
+	// We assume each tick begins with no two physical objects interpenetrating.
+	// Note that a more sophisticated system would abstract the notion of what
+	// kind of integration technique we're using here, but I'm just going to use
+	// Euler integration here for the sake of simplicity.  Maybe that will be
+	// good enough?
+	this->ToStateVector(currentState);
 	while (this->currentTime < presentTime)
 	{
-		for (PhysicalObject* physicalObject : *this->physicalObjectArray)
-			physicalObject->ZeroNetForcesAndTorques();
-
-		for (ConceptObject* conceptObject : *this->conceptObjectArray)
-			conceptObject->ApplyForcesAndTorques(this, this->currentTime);
+		VectorN currentStateDerivative(currentState.GetDimension());
+		this->ToStateVectorDerivative(currentStateDerivative);
 
 		double timeStep = this->maxTimeStepSize;
 		if (this->currentTime + timeStep > presentTime)
 			timeStep = presentTime - this->currentTime;
 
-		for (PhysicalObject* physicalObject : *this->physicalObjectArray)
-			physicalObject->Integrate(timeStep);
-
+		currentState += currentStateDerivative * timeStep;
+		this->FromStateVector(currentState);
 		this->currentTime += timeStep;
 
 		if (this->InterpenetrationDetected())
@@ -103,7 +113,7 @@ void Simulation::Tick()
 			this->ForAllCollisionPairs([this](PhysicalObject* objectA, PhysicalObject* objectB) -> bool {
 				this->ResolveCollision(objectA, objectB);
 				return true;
-			});
+				});
 
 			// DEBUG CODE!
 #if 1
@@ -112,6 +122,33 @@ void Simulation::Tick()
 #endif
 		}
 	}
+}
+
+void Simulation::ToStateVector(VectorN& stateVector) const
+{
+	int i = 0;
+	for (const PhysicalObject* physicalObject : *this->physicalObjectArray)
+		physicalObject->GetStateToVector(stateVector, i);
+}
+
+void Simulation::FromStateVector(const VectorN& stateVector)
+{
+	int i = 0;
+	for (PhysicalObject* physicalObject : *this->physicalObjectArray)
+		physicalObject->SetStateFromVector(stateVector, i);
+}
+
+void Simulation::ToStateVectorDerivative(VectorN& stateVectorDerivative)
+{
+	for (PhysicalObject* physicalObject : *this->physicalObjectArray)
+		physicalObject->ZeroNetForcesAndTorques();
+
+	for (ConceptObject* conceptObject : *this->conceptObjectArray)
+		conceptObject->ApplyForcesAndTorques(this, this->currentTime);
+
+	int i = 0;
+	for (const PhysicalObject* physicalObject : *this->physicalObjectArray)
+		physicalObject->CalcStateDerivatives(stateVectorDerivative, i);
 }
 
 bool Simulation::InterpenetrationDetected() const

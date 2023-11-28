@@ -58,6 +58,9 @@
     <ClInclude Include="Source\LineSegment.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\VectorN.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp">
@@ -103,6 +106,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\LineSegment.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VectorN.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
