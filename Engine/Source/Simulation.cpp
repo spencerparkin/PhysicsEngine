@@ -82,6 +82,8 @@ void Simulation::Tick()
 			this->conceptObjectArray->push_back(conceptObject);
 	}
 
+	// TODO: I don't think we really need this N-vector thing.  Should probably ditch it.
+	
 	// Determine how much space we need in our state vector.
 	VectorN currentState;
 	int N = 0;
