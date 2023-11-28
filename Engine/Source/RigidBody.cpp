@@ -182,10 +182,6 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	std::vector<PolygonMesh::ContactPoint> contactPointArray;
 	PolygonMesh::ConvexHullsIntersect(*meshA, *meshB, &contactPointArray);
 
-	// All contact points detected are face/vertex contacts, but they need to be compressed by proximity.
-	// Further, some may need to be re-classified as edge/edge contacts and then have their normals recalculated
-	// as the cross between the detected edges.
-
 	// If they are not touching one another, there is nothing for us to do.
 	// This shouldn't happen since we shouldn't be called unless the calling
 	// code is sure that we're in collision with the given object.

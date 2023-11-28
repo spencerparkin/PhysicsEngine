@@ -72,6 +72,8 @@ namespace PhysicsEngine
 
 	private:
 
+		static void CompressContactPointArray(const std::vector<ContactPoint>& contactPointArray, std::vector<ContactPoint>& compressedContactPointArray);
+
 		struct Triangle
 		{
 		public:

@@ -20,6 +20,7 @@
 
 #define PHY_ENG_SMALL_EPS		1e-6
 #define PHY_ENG_FAT_EPS			0.05
+#define PHY_ENG_OBESE_EPS		0.1
 #define PHY_ENG_PI				3.1415926536
 #define PHY_ENG_SQUARED(x)		((x) * (x))
 #define PHY_ENG_SIGN(x)			((x) < 0 ? -1.0 : 1.0)

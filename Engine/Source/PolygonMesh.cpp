@@ -296,10 +296,113 @@ bool PolygonMesh::CalcCenter(Vector3& center) const
 
 /*static*/ bool PolygonMesh::ConvexHullsIntersect(const PolygonMesh& meshA, const PolygonMesh& meshB, std::vector<ContactPoint>* contactPointArray /*= nullptr*/)
 {
-	if (meshA.EdgeStrikesFaceOf(meshB, contactPointArray) && !contactPointArray)
-		return true;
+	if (!contactPointArray)
+	{
+		if (meshA.EdgeStrikesFaceOf(meshB))
+			return true;
 
-	return meshB.EdgeStrikesFaceOf(meshA, contactPointArray);
+		if (meshB.EdgeStrikesFaceOf(meshA))
+			return true;
+
+		return false;
+	}
+
+	std::vector<ContactPoint> contactPointArrayA, contactPointArrayB;
+
+	meshA.EdgeStrikesFaceOf(meshB, &contactPointArrayB);
+	meshB.EdgeStrikesFaceOf(meshA, &contactPointArrayA);
+	
+	if (contactPointArrayB.size() == 0 && contactPointArrayA.size() == 0)
+		return false;
+	
+	std::vector<ContactPoint> compressedContactPointArrayA, compressedContactPointArrayB;
+
+	// These must be compressed individually before the lists are merged.
+	CompressContactPointArray(contactPointArrayA, compressedContactPointArrayA);
+	CompressContactPointArray(contactPointArrayB, compressedContactPointArrayB);
+
+	// Now merge the lists.
+	std::vector<ContactPoint> mixedContactPointArray;
+	for (const ContactPoint& contactPoint : compressedContactPointArrayA)
+		mixedContactPointArray.push_back(contactPoint);
+	for (const ContactPoint& contactPoint : compressedContactPointArrayB)
+		mixedContactPointArray.push_back(contactPoint);
+
+	// This final merge will now take the cross product of edge directions across shapes.
+	CompressContactPointArray(mixedContactPointArray, *contactPointArray);
+
+	// The last step now is to make the normals of the contact points all face in a consistent direction.
+	// By convention, we'll make sure all contact normals are facing away from mesh B as much as possible.
+	// This is not fool-proof!  Is there a better way?
+	Vector3 center;
+	meshB.CalcCenter(center);
+	for (ContactPoint& contactPoint : *contactPointArray)
+	{
+		Vector3 vectorA = ((contactPoint.point + contactPoint.normal) - center);
+		Vector3 vectorB = ((contactPoint.point - contactPoint.normal) - center);
+		
+		double squareDistanceA = vectorA.InnerProduct(vectorA);
+		double squareDistanceB = vectorB.InnerProduct(vectorB);
+
+		if (squareDistanceA < squareDistanceB)
+			contactPoint.normal = -contactPoint.normal;
+	}
+
+	return true;
+}
+
+/*static*/ void PolygonMesh::CompressContactPointArray(const std::vector<ContactPoint>& contactPointArray, std::vector<ContactPoint>& compressedContactPointArray)
+{
+	std::vector<ContactPoint> intermediateContactPointArray;
+
+	// First merge all co-located points facing in the same direction.
+	for (const ContactPoint& newContactPoint : contactPointArray)
+	{
+		bool merged = false;
+
+		for (ContactPoint& existingContactPoint : intermediateContactPointArray)
+		{
+			if ((newContactPoint.point - existingContactPoint.point).Length() < PHY_ENG_OBESE_EPS)
+			{
+				double angle = ::acos(newContactPoint.normal.InnerProduct(existingContactPoint.normal));
+				if (angle < PHY_ENG_SMALL_EPS)
+				{
+					ContactPoint mergedContactPoint;
+					mergedContactPoint.point = (newContactPoint.point + existingContactPoint.point) / 2.0;
+					mergedContactPoint.normal = (newContactPoint.normal + existingContactPoint.normal) / 2.0;
+					existingContactPoint = mergedContactPoint;
+					merged = true;
+					break;
+				}
+			}
+		}
+
+		if (!merged)
+			intermediateContactPointArray.push_back(newContactPoint);
+	}
+
+	// Next merge all co-located points facing different directions with a cross product, giving us the direction of an edge,
+	// or giving us the cross-product of two edges across different shapes.
+	for (const ContactPoint& newContactPoint : intermediateContactPointArray)
+	{
+		bool merged = false;
+
+		for (ContactPoint& existingContactPoint : compressedContactPointArray)
+		{
+			if ((newContactPoint.point - existingContactPoint.point).Length() < PHY_ENG_OBESE_EPS)
+			{
+				ContactPoint mergedContactPoint;
+				mergedContactPoint.point = (newContactPoint.point + existingContactPoint.point) / 2.0;
+				mergedContactPoint.normal = newContactPoint.normal.CrossProduct(existingContactPoint.normal);
+				existingContactPoint = mergedContactPoint;
+				merged = true;
+				break;
+			}
+		}
+
+		if (!merged)
+			compressedContactPointArray.push_back(newContactPoint);
+	}
 }
 
 bool PolygonMesh::EdgeStrikesFaceOf(const PolygonMesh& mesh, std::vector<ContactPoint>* contactPointArray /*= nullptr*/) const
