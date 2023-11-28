@@ -15,7 +15,7 @@ Simulation::Simulation()
 	this->currentTime = 0.0;
 	this->maxDeltaTime = 0.5;
 	this->maxTimeStepSize = 0.0025;
-	this->collisionTimeTolerance = 0.0002;
+	this->collisionTimeTolerance = 0.00005;
 	this->tickEnabled = true;
 }
 

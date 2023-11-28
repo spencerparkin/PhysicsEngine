@@ -257,6 +257,32 @@ void Canvas::OnKeyUp(wxKeyEvent& event)
 				this->keyboardMode = KeyboardMode::FREE_CAM;
 			break;
 		}
+		case 'r':
+		case 'R':
+		{
+			RigidBody* bodyA = dynamic_cast<RigidBody*>(wxGetApp().simulation.FindPhysicsObject("boxA"));
+			RigidBody* bodyB = dynamic_cast<RigidBody*>(wxGetApp().simulation.FindPhysicsObject("boxB"));
+
+			if (bodyA && bodyB)
+			{
+				Matrix3x3 identity;
+				identity.SetIdentity();
+
+				bodyA->SetLocation(Vector3(-3.0, 0.0, 0.0));
+				bodyA->SetOrientation(identity);
+				bodyA->SetVelocity(Vector3(0.0, 0.0, 0.0));
+				bodyA->SetAngularVelocity(Vector3(0.0, 0.0, 0.0));
+
+				bodyB->SetLocation(Vector3(3.0, 0.0, 0.0));
+				bodyB->SetOrientation(identity);
+				bodyB->SetVelocity(Vector3(0.0, 0.0, 0.0));
+				bodyB->SetAngularVelocity(Vector3(0.0, 0.0, 0.0));
+
+				wxGetApp().simulation.tickEnabled = true;
+			}
+
+			break;
+		}
 	}
 }
 

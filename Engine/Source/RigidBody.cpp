@@ -153,12 +153,7 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 
 	const_cast<RigidBody*>(this)->orientation.Orthonormalize();
 
-	Matrix3x3 orientationInv(this->orientation);
-	orientationInv.Transpose();
-
-	Matrix3x3 inertiaTensorInv = this->orientation * this->bodySpaceInertiaTensorInv * orientationInv;
-
-	Vector3 angularVelocity = inertiaTensorInv * this->angularMomentum;
+	Vector3 angularVelocity = this->GetAngularVelocity();
 	Matrix3x3 angularVelocityMatrix;
 	angularVelocityMatrix.SetForCrossProduct(angularVelocity);
 
@@ -175,6 +170,33 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	stateVectorDerivative[i++] = this->netTorque.x;
 	stateVectorDerivative[i++] = this->netTorque.y;
 	stateVectorDerivative[i++] = this->netTorque.z;
+}
+
+Vector3 RigidBody::GetVelocity() const
+{
+	return this->linearMomentum / this->mass;
+}
+
+void RigidBody::SetVelocity(const Vector3& velocity)
+{
+	this->linearMomentum = velocity * this->mass;
+}
+
+Vector3 RigidBody::GetAngularVelocity() const
+{
+	Matrix3x3 orientationInv(this->orientation);
+	orientationInv.Transpose();
+	Matrix3x3 inertiaTensorInv = this->orientation * this->bodySpaceInertiaTensorInv * orientationInv;
+	Vector3 angularVelocity = inertiaTensorInv * this->angularMomentum;
+	return angularVelocity;
+}
+
+void RigidBody::SetAngularVelocity(const Vector3& angularVelocity)
+{
+	Matrix3x3 orientationInv(this->orientation);
+	orientationInv.Transpose();
+	Matrix3x3 inertiaTensor = this->orientation * this->bodySpaceInertiaTensor * orientationInv;
+	this->angularMomentum = inertiaTensor * angularVelocity;
 }
 
 /*virtual*/ double RigidBody::GetMass() const
@@ -351,7 +373,7 @@ RigidBody::ContactPointClassification RigidBody::ClassifyContactPoint(const Vect
 	{
 		const Vector3& vertex = mesh.GetVertexArray()[i];
 		double distance = (vertex - contactPoint).Length();
-		if (distance < PHY_ENG_FAT_EPS)
+		if (distance < PHY_ENG_OBESE_EPS)
 		{
 			std::vector<const PolygonMesh::Polygon*> polygonArray;
 			mesh.FindAllFacesSharingVertex(i, polygonArray);
@@ -375,7 +397,7 @@ RigidBody::ContactPointClassification RigidBody::ClassifyContactPoint(const Vect
 		LineSegment edgeSegment;
 		edgeSegment.pointA = mesh.GetVertexArray()[edge.i];
 		edgeSegment.pointB = mesh.GetVertexArray()[edge.j];
-		if (edgeSegment.ContainsPoint(contactPoint, PHY_ENG_FAT_EPS))
+		if (edgeSegment.ContainsPoint(contactPoint, PHY_ENG_OBESE_EPS))
 		{
 			std::vector<const PolygonMesh::Polygon*> polygonArray;
 			mesh.FindAllFacesSharingEdge(edge, polygonArray);

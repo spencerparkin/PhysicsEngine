@@ -33,6 +33,10 @@ namespace PhysicsEngine
 		const Matrix3x3& GetOrientation() const { return this->orientation; }
 		void SetLocation(const Vector3& location) { this->position = location; }
 		void SetOrientation(const Matrix3x3& orientation) { this->orientation = orientation; }
+		Vector3 GetVelocity() const;
+		void SetVelocity(const Vector3& velocity);
+		Vector3 GetAngularVelocity() const;
+		void SetAngularVelocity(const Vector3& angularVelocity);
 
 		virtual void ZeroNetForcesAndTorques() override;
 		virtual double GetMass() const override;

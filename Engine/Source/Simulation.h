@@ -37,6 +37,8 @@ namespace PhysicsEngine
 		PhysicsObjectMap& GetPhysicsObjectMap() { return *this->physicsObjectMap; }
 		PhysicsObject* FindPhysicsObject(const std::string& name);
 
+		bool tickEnabled;	// TODO: Not sure I want to keep this.
+
 	private:
 
 		void ToStateVector(VectorN& stateVector) const;
@@ -48,8 +50,6 @@ namespace PhysicsEngine
 
 		typedef std::function<bool(PhysicalObject*, PhysicalObject*)> CollisionPairFunc;
 		void ForAllCollisionPairs(CollisionPairFunc collisionPairFunc);
-
-		bool tickEnabled;
 
 		// TODO: At some point we need to index all physics objects using
 		//       a spacial partitioning datastructure in order to facilitate

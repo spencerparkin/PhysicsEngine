@@ -47,6 +47,7 @@ namespace PhysicsEngine
 			PolygonMesh* GetMesh() { return this->mesh; }
 			const PolygonMesh* GetMesh() const { return this->mesh; }
 			bool ContainsPoint(const Vector3& point, double thickness = PHY_ENG_SMALL_EPS) const;
+			bool TubeContainsPoint(const Vector3& point, double thickness = PHY_ENG_SMALL_EPS) const;
 
 		private:
 			PolygonMesh* mesh;

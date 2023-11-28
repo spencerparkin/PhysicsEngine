@@ -637,10 +637,21 @@ bool PolygonMesh::Polygon::IntersectedBy(const LineSegment& lineSegment, Vector3
 	if (!lineSegment.IntersectWith(polygonPlane, intersectionPoint, thickness))
 		return false;
 
-	return this->ContainsPoint(intersectionPoint, thickness);
+	return this->TubeContainsPoint(intersectionPoint, thickness);
 }
 
 bool PolygonMesh::Polygon::ContainsPoint(const Vector3& point, double thickness /*= PHY_ENG_SMALL_EPS*/) const
+{
+	Plane polygonPlane;
+	this->MakePlane(polygonPlane);
+
+	if (polygonPlane.WhichSide(point, thickness) != Plane::Side::NEITHER)
+		return false;
+
+	return this->TubeContainsPoint(point, thickness);
+}
+
+bool PolygonMesh::Polygon::TubeContainsPoint(const Vector3& point, double thickness /*= PHY_ENG_SMALL_EPS*/) const
 {
 	Plane polygonPlane;
 	this->MakePlane(polygonPlane);
