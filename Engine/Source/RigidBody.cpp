@@ -182,6 +182,9 @@ bool RigidBody::MakeShape(const std::vector<Vector3>& pointArray, double deltaLe
 	std::vector<Vector3> contactPointArray;
 	PolygonMesh::ConvexHullsIntersect(*meshA, *meshB, &contactPointArray);
 
+	std::vector<Vector3> contactNormalArray;
+	// TODO: Classify the contact points so that we can assign contact normals.
+
 	// If they are not touching one another, there is nothing for us to do.
 	// This shouldn't happen since we shouldn't be called unless the calling
 	// code is sure that we're in collision with the given object.
