@@ -322,8 +322,8 @@ bool PolygonMesh::CalcCenter(Vector3& center) const
 		bool mergedPoint = false;
 		for (Vector3& existingPoint : *contactPointArray)
 		{
-			double squareDistance = (point - existingPoint).InnerProduct(point - existingPoint);
-			if (squareDistance < PHY_ENG_OBESE_EPS * PHY_ENG_OBESE_EPS)
+			double distance = (point - existingPoint).Length();
+			if (distance < PHY_ENG_OBESE_EPS)
 			{
 				existingPoint = (existingPoint + point) / 2.0;
 				mergedPoint = true;

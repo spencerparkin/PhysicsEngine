@@ -60,6 +60,7 @@ namespace PhysicsEngine
 		double currentTime;				// Each tick, we get our current time caught up with the present time.
 		double maxDeltaTime;			// A tick is aborted if the gap between the present time and the current time exceeds this.
 		double maxTimeStepSize;			// We catch up to the present time in increments of this size.
+		double collisionTimeTolerance;	// Times of collision are determined with an accuracy up to this tolerance.
 
 		std::vector<PhysicalObject*>* physicalObjectArray;
 		std::vector<ConceptObject*>* conceptObjectArray;
