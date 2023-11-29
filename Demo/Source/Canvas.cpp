@@ -268,12 +268,12 @@ void Canvas::OnKeyUp(wxKeyEvent& event)
 				Matrix3x3 identity;
 				identity.SetIdentity();
 
-				bodyA->SetLocation(Vector3(-3.0, 0.0, 0.0));
+				bodyA->SetLocation(Vector3(1.0, 3.0, 0.0));
 				bodyA->SetOrientation(identity);
 				bodyA->SetVelocity(Vector3(0.0, 0.0, 0.0));
 				bodyA->SetAngularVelocity(Vector3(0.0, 0.0, 0.0));
 
-				bodyB->SetLocation(Vector3(3.0, 0.0, 0.0));
+				bodyB->SetLocation(Vector3(0.0, -2.0, 0.0));
 				bodyB->SetOrientation(identity);
 				bodyB->SetVelocity(Vector3(0.0, 0.0, 0.0));
 				bodyB->SetAngularVelocity(Vector3(0.0, 0.0, 0.0));
