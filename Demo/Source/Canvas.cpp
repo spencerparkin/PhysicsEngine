@@ -157,13 +157,13 @@ void Canvas::HandleKeypresses()
 				force += viewFrame * Vector3(0.0, strength, 0.0);		// +Y	
 
 			// Apply a torque.
-			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD2))
-				torque += viewFrame * Vector3(-strength, 0.0, 0.0);		// -X
 			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD8))
+				torque += viewFrame * Vector3(-strength, 0.0, 0.0);		// -X
+			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD2))
 				torque += viewFrame * Vector3(strength, 0.0, 0.0);		// +X
-			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD6))
-				torque += viewFrame * Vector3(0.0, -strength, 0.0);		// -Y
 			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD4))
+				torque += viewFrame * Vector3(0.0, -strength, 0.0);		// -Y
+			if (wxGetKeyState(wxKeyCode::WXK_NUMPAD6))
 				torque += viewFrame * Vector3(0.0, strength, 0.0);		// +Y
 
 			this->jediForce->SetForce(force);
