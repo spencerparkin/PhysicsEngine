@@ -144,6 +144,8 @@ void Simulation::Tick()
 				this->ResolveCollision(objectA, objectB);
 				return true;
 			});
+
+			this->ToStateVector(currentState);
 		}
 	}
 }

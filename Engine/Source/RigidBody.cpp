@@ -358,65 +358,73 @@ void RigidBody::SetAngularVelocity(const Vector3& angularVelocity)
 	if (contactPointArray.size() == 0)
 		return CollisionResolution::FAILED;
 
-	for (int i = 0; i < (signed)contactPointArray.size(); i++)
+	bool collisionOccurred = false;
+	do
 	{
-		const Vector3& contactPoint = contactPointArray[i];
-		const Vector3& contactNormal = contactNormalArray[i];
+		collisionOccurred = false;
 
-		Matrix3x3 orientationInvA(bodyA->orientation);
-		Matrix3x3 orientationInvB(bodyB->orientation);
-
-		orientationInvA.Transpose();
-		orientationInvB.Transpose();
-
-		Matrix3x3 inertiaTensorInvA = bodyA->orientation * bodyA->bodySpaceInertiaTensorInv * orientationInvA;
-		Matrix3x3 inertiaTensorInvB = bodyB->orientation * bodyB->bodySpaceInertiaTensorInv * orientationInvB;
-
-		Vector3 bodyVelocityA = bodyA->GetVelocity();
-		Vector3 bodyVelocityB = bodyB->GetVelocity();
-
-		Vector3 bodyAngularVelocityA = inertiaTensorInvA * bodyA->angularMomentum;
-		Vector3 bodyAngularVelocityB = inertiaTensorInvB * bodyB->angularMomentum;
-
-		Vector3 particleVecA = contactPoint - bodyA->GetLocation();
-		Vector3 particleVecB = contactPoint - bodyB->GetLocation();
-
-		Vector3 particleVelA = bodyVelocityA + bodyAngularVelocityA.CrossProduct(particleVecA);
-		Vector3 particleVelB = bodyVelocityB + bodyAngularVelocityB.CrossProduct(particleVecB);
-
-		double relativeVelocity = contactNormal.InnerProduct(particleVelA - particleVelB);
-		if (relativeVelocity < 0.0)
+		for (int i = 0; i < (signed)contactPointArray.size(); i++)
 		{
-			// We have colliding contact in progress.  Resolve it.
-			Vector3 impulse(contactNormal);
+			const Vector3& contactPoint = contactPointArray[i];
+			const Vector3& contactNormal = contactNormalArray[i];
 
-			double term1 = 1.0 / bodyA->mass;
-			double term2 = 1.0 / bodyB->mass;
-			double term3 = contactNormal.InnerProduct((inertiaTensorInvA * particleVecA.CrossProduct(contactNormal)).CrossProduct(particleVecA));
-			double term4 = contactNormal.InnerProduct((inertiaTensorInvB * particleVecB.CrossProduct(contactNormal)).CrossProduct(particleVecB));
+			Matrix3x3 orientationInvA(bodyA->orientation);
+			Matrix3x3 orientationInvB(bodyB->orientation);
 
-			double coeficientOfRestitution = 1.0;
-			double mag = -((1.0 + coeficientOfRestitution) * relativeVelocity) / (term1 + term2 + term3 + term4);
-			assert(mag >= 0.0);
-			impulse *= mag;
+			orientationInvA.Transpose();
+			orientationInvB.Transpose();
 
-			bodyA->linearMomentum += impulse;
-			bodyB->linearMomentum -= impulse;
-			bodyA->angularMomentum += particleVecA.CrossProduct(impulse);	// Apply the "impulsive torque" to A.
-			bodyB->angularMomentum -= particleVecB.CrossProduct(impulse);	// Apply the "impulsive torque" to B.
+			Matrix3x3 inertiaTensorInvA = bodyA->orientation * bodyA->bodySpaceInertiaTensorInv * orientationInvA;
+			Matrix3x3 inertiaTensorInvB = bodyB->orientation * bodyB->bodySpaceInertiaTensorInv * orientationInvB;
+
+			Vector3 bodyVelocityA = bodyA->GetVelocity();
+			Vector3 bodyVelocityB = bodyB->GetVelocity();
+
+			Vector3 bodyAngularVelocityA = inertiaTensorInvA * bodyA->angularMomentum;
+			Vector3 bodyAngularVelocityB = inertiaTensorInvB * bodyB->angularMomentum;
+
+			Vector3 particleVecA = contactPoint - bodyA->GetLocation();
+			Vector3 particleVecB = contactPoint - bodyB->GetLocation();
+
+			Vector3 particleVelA = bodyVelocityA + bodyAngularVelocityA.CrossProduct(particleVecA);
+			Vector3 particleVelB = bodyVelocityB + bodyAngularVelocityB.CrossProduct(particleVecB);
+
+			double relativeVelocity = contactNormal.InnerProduct(particleVelA - particleVelB);
+			if (relativeVelocity < 0.0)
+			{
+				// We have colliding contact in progress.  Resolve it.
+				Vector3 impulse(contactNormal);
+
+				double term1 = 1.0 / bodyA->mass;
+				double term2 = 1.0 / bodyB->mass;
+				double term3 = contactNormal.InnerProduct((inertiaTensorInvA * particleVecA.CrossProduct(contactNormal)).CrossProduct(particleVecA));
+				double term4 = contactNormal.InnerProduct((inertiaTensorInvB * particleVecB.CrossProduct(contactNormal)).CrossProduct(particleVecB));
+
+				double coeficientOfRestitution = 1.0;
+				double mag = -((1.0 + coeficientOfRestitution) * relativeVelocity) / (term1 + term2 + term3 + term4);
+				assert(mag >= 0.0);
+				impulse *= mag;
+
+				bodyA->linearMomentum += impulse;
+				bodyB->linearMomentum -= impulse;
+				bodyA->angularMomentum += particleVecA.CrossProduct(impulse);	// Apply the "impulsive torque" to A.
+				bodyB->angularMomentum -= particleVecB.CrossProduct(impulse);	// Apply the "impulsive torque" to B.
+
+				collisionOccurred = true;
+			}
+			else if (relativeVelocity == 0.0)
+			{
+				// TODO: Resting contact?!?!?!?????????
+
+				return CollisionResolution::FAILED;
+			}
+			else
+			{
+				// In this case, the bodys are in contact, but moving away from one another.
+				// There is nothing for us to resolve here.
+			}
 		}
-		else if (relativeVelocity == 0.0)
-		{
-			// TODO: Resting contact?!?!?!?????????
-
-			return CollisionResolution::FAILED;
-		}
-		else
-		{
-			// In this case, the bodys are in contact, but moving away from one another.
-			// There is nothing for us to resolve here.
-		}
-	}
+	} while (collisionOccurred);
 
 	return CollisionResolution::SUCCEEDED;
 }
