@@ -368,6 +368,15 @@ void RigidBody::SetAngularVelocity(const Vector3& angularVelocity)
 	if (contactPointArray.size() == 0)
 		return CollisionResolution::FAILED;
 
+	Matrix3x3 orientationInvA(bodyA->orientation);
+	Matrix3x3 orientationInvB(bodyB->orientation);
+
+	orientationInvA.Transpose();
+	orientationInvB.Transpose();
+
+	Matrix3x3 inertiaTensorInvA = bodyA->orientation * bodyA->bodySpaceInertiaTensorInv * orientationInvA;
+	Matrix3x3 inertiaTensorInvB = bodyB->orientation * bodyB->bodySpaceInertiaTensorInv * orientationInvB;
+
 	bool collisionOccurred = false;
 	do
 	{
@@ -377,15 +386,6 @@ void RigidBody::SetAngularVelocity(const Vector3& angularVelocity)
 		{
 			const Vector3& contactPoint = contactPointArray[i];
 			const Vector3& contactNormal = contactNormalArray[i];
-
-			Matrix3x3 orientationInvA(bodyA->orientation);
-			Matrix3x3 orientationInvB(bodyB->orientation);
-
-			orientationInvA.Transpose();
-			orientationInvB.Transpose();
-
-			Matrix3x3 inertiaTensorInvA = bodyA->orientation * bodyA->bodySpaceInertiaTensorInv * orientationInvA;
-			Matrix3x3 inertiaTensorInvB = bodyB->orientation * bodyB->bodySpaceInertiaTensorInv * orientationInvB;
 
 			Vector3 bodyVelocityA = bodyA->GetVelocity();
 			Vector3 bodyVelocityB = bodyB->GetVelocity();
