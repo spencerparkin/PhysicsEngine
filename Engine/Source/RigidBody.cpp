@@ -204,6 +204,16 @@ void RigidBody::SetAngularVelocity(const Vector3& angularVelocity)
 	return this->mass;
 }
 
+/*virtual*/ Vector3 RigidBody::GetCenter() const
+{
+	return this->GetLocation();
+}
+
+/*virtual*/ void RigidBody::SetCenter(const Vector3& center)
+{
+	this->SetLocation(center);
+}
+
 /*virtual*/ void RigidBody::AccumulateForce(const Vector3& force)
 {
 	this->netForce += force;

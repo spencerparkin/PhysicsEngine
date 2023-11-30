@@ -3,6 +3,7 @@
 #include <wx/setup.h>
 #include <wx/app.h>
 #include "Simulation.h"
+#include "AxisAlignedBoundingBox.h"
 
 class Frame;
 
@@ -18,6 +19,7 @@ public:
 	Frame* frame;
 
 	PhysicsEngine::Simulation simulation;
+	PhysicsEngine::AxisAlignedBoundingBox worldBox;
 };
 
 wxDECLARE_APP(Application);

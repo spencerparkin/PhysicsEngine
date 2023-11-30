@@ -1,6 +1,6 @@
 # PhysicsEngine
 
-The aptly named *PhysicsEngine* is, as its namesake suggests, an engine of physics, or "physics engine" in modern parlance.  For now, it's primary concern is that of the simulation of the motion of rigid bodies through space.  Each rigid body takes the form of a convex hull.
+The aptly named *PhysicsEngine* is, as its namesake suggests, an engine of physics, or "physics engine" in modern parlance.  For now, its primary concern is that of the simulation of the motion of rigid bodies through space.  Each rigid body takes the form of a convex hull.
 
 There appears to be 3 fundamental actions in such simulations.  They are as follows.
 

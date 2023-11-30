@@ -29,6 +29,8 @@ namespace PhysicsEngine
 		};
 
 		virtual double GetMass() const = 0;
+		virtual Vector3 GetCenter() const = 0;
+		virtual void SetCenter(const Vector3& center) = 0;
 		virtual void AccumulateForce(const Vector3& force) = 0;
 		virtual void AccumulateTorque(const Vector3& torque);
 		virtual int GetStateSpaceRequirement() const;

@@ -40,6 +40,8 @@ namespace PhysicsEngine
 
 		virtual void ZeroNetForcesAndTorques() override;
 		virtual double GetMass() const override;
+		virtual Vector3 GetCenter() const override;
+		virtual void SetCenter(const Vector3& center) override;
 		virtual void AccumulateForce(const Vector3& force) override;
 		virtual void AccumulateTorque(const Vector3& torque) override;
 		virtual int GetStateSpaceRequirement() const override;
