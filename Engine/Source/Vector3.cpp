@@ -63,12 +63,36 @@ bool Vector3::Normalize(double* length /*= nullptr*/)
 	return true;
 }
 
-void Vector3::Decompose(Vector3& projection, Vector3& rejection) const
+Vector3 Vector3::Normalized() const
 {
+	Vector3 vector(*this);
+	if (!vector.Normalize())
+		vector = Vector3(0.0, 0.0, 0.0);
+	return vector;
+}
+
+void Vector3::Decompose(const Vector3& unitVector, Vector3& projection, Vector3& rejection) const
+{
+	projection = this->InnerProduct(unitVector) * unitVector;
+	rejection = *this - projection;
 }
 
 void Vector3::Rotate(const Vector3& axis, double angle)
 {
+	Vector3 zAxis = axis.Normalized();
+	Vector3 projection, rejection;
+	this->Decompose(zAxis, projection, rejection);
+	Vector3 xAxis = rejection;
+	double radius = 0.0;
+	xAxis.Normalize(&radius);
+	Vector3 yAxis = zAxis.CrossProduct(xAxis);
+	rejection = radius * ::cos(angle) * xAxis + radius * ::sin(angle) * yAxis;
+	*this = projection + rejection;
+}
+
+double Vector3::AngleBetween(const Vector3& vector) const
+{
+	return ::acos(this->Normalized().InnerProduct(vector.Normalized()));
 }
 
 void Vector3::operator=(const Vector3& vector)

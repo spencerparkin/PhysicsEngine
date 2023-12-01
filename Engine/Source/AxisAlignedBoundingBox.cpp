@@ -201,6 +201,17 @@ bool AxisAlignedBoundingBox::CalcPoint(Vector3& point, const Vector3& texCoords)
 	return true;
 }
 
+void AxisAlignedBoundingBox::Fatten(double length)
+{
+	this->min.x -= length / 2.0;
+	this->min.y -= length / 2.0;
+	this->min.z -= length / 2.0;
+
+	this->max.x += length / 2.0;
+	this->max.y += length / 2.0;
+	this->max.z += length / 2.0;
+}
+
 void AxisAlignedBoundingBox::VisitSubBoxes(double deltaLength, VisitationFunc visitationFunc)
 {
 	if (!this->IsValid() || deltaLength <= 0.0)

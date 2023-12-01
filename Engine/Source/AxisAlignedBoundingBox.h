@@ -39,6 +39,8 @@ namespace PhysicsEngine
 		bool CalcUVWs(const Vector3& point, Vector3& texCoords) const;
 		bool CalcPoint(Vector3& point, const Vector3& texCoords) const;
 
+		void Fatten(double length);
+
 		typedef std::function<void(const AxisAlignedBoundingBox&)> VisitationFunc;
 
 		// This might be used for integration purposes.

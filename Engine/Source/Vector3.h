@@ -16,8 +16,10 @@ namespace PhysicsEngine
 		double InnerProduct(const Vector3& vector) const;
 		Vector3 CrossProduct(const Vector3& vector) const;
 		bool Normalize(double* length = nullptr);
-		void Decompose(Vector3& projection, Vector3& rejection) const;
+		Vector3 Normalized() const;
+		void Decompose(const Vector3& unitVector, Vector3& projection, Vector3& rejection) const;
 		void Rotate(const Vector3& axis, double angle);
+		double AngleBetween(const Vector3& vector) const;
 
 		void operator=(const Vector3& vector);
 		void operator+=(const Vector3& vector);

@@ -1,4 +1,5 @@
 #include "PhysicalObject.h"
+#include "Vector3.h"
 
 using namespace PhysicsEngine;
 
@@ -17,6 +18,24 @@ PhysicalObject::PhysicalObject()
 /*virtual*/ int PhysicalObject::GetStateSpaceRequirement() const
 {
 	return 0;
+}
+
+/*virtual*/ double PhysicalObject::GetMass() const
+{
+	return 0.0;
+}
+
+/*virtual*/ Vector3 PhysicalObject::GetCenter() const
+{
+	return Vector3(0.0, 0.0, 0.0);
+}
+
+/*virtual*/ void PhysicalObject::SetCenter(const Vector3& center)
+{
+}
+
+/*virtual*/ void PhysicalObject::AccumulateForce(const Vector3& force)
+{
 }
 
 /*virtual*/ void PhysicalObject::SetStateFromVector(const VectorN& stateVector, int& i)

@@ -61,6 +61,9 @@
     <ClInclude Include="Source\VectorN.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GroundPlane.h">
+      <Filter>Source\PhysicsObjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AxisAlignedBoundingBox.cpp">
@@ -110,6 +113,9 @@
     </ClCompile>
     <ClCompile Include="Source\VectorN.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GroundPlane.cpp">
+      <Filter>Source\PhysicsObjects</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -28,10 +28,10 @@ namespace PhysicsEngine
 			SUCCEEDED
 		};
 
-		virtual double GetMass() const = 0;
-		virtual Vector3 GetCenter() const = 0;
-		virtual void SetCenter(const Vector3& center) = 0;
-		virtual void AccumulateForce(const Vector3& force) = 0;
+		virtual double GetMass() const;
+		virtual Vector3 GetCenter() const;
+		virtual void SetCenter(const Vector3& center);
+		virtual void AccumulateForce(const Vector3& force);
 		virtual void AccumulateTorque(const Vector3& torque);
 		virtual int GetStateSpaceRequirement() const;
 		virtual void SetStateFromVector(const VectorN& stateVector, int& i);

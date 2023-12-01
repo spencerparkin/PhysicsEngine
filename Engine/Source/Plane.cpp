@@ -56,3 +56,8 @@ void Plane::Transform(const Vector3& translation, const Matrix3x3& rotation)
 	this->normal.Normalize();
 	this->D = center.InnerProduct(this->normal);
 }
+
+Vector3 Plane::NearestPoint(const Vector3& point) const
+{
+	return point - this->normal * this->SignedDistanceToPoint(point);
+}

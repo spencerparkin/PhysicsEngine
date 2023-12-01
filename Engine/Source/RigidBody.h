@@ -37,6 +37,12 @@ namespace PhysicsEngine
 		void SetVelocity(const Vector3& velocity);
 		Vector3 GetAngularVelocity() const;
 		void SetAngularVelocity(const Vector3& angularVelocity);
+		const Matrix3x3& GetBodySpaceInertiaTensor() const { return this->bodySpaceInertiaTensor; }
+		const Matrix3x3& GetBodySpaceInertiaTensorInv() const { return this->bodySpaceInertiaTensorInv; }
+		const Vector3& GetLinearMomentum() const { return this->linearMomentum; }
+		const Vector3& GetAngularMomentum() const { return this->angularMomentum; }
+		void SetLinearMomentum(const Vector3& linearMomentum) { this->linearMomentum = linearMomentum; }
+		void SetAngularMomentum(const Vector3& angularMomentum) { this->angularMomentum = angularMomentum; }
 
 		virtual void ZeroNetForcesAndTorques() override;
 		virtual double GetMass() const override;
