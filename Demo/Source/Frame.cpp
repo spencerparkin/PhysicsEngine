@@ -51,35 +51,6 @@ void Frame::OnTimer(wxTimerEvent& event)
 
 	wxGetApp().simulation.Tick();
 
-	Simulation::PhysicsObjectMap& objectMap = wxGetApp().simulation.GetPhysicsObjectMap();
-	for (auto pair : objectMap)
-	{
-		auto physicalObject = dynamic_cast<PhysicalObject*>(pair.second);
-		if (physicalObject)
-		{
-			Vector3 center = physicalObject->GetCenter();
-			if (!wxGetApp().worldBox.ContainsPoint(center))
-			{
-				while (center.x < wxGetApp().worldBox.min.x)
-					center.x += wxGetApp().worldBox.Width();
-				while (center.x > wxGetApp().worldBox.max.x)
-					center.x -= wxGetApp().worldBox.Width();
-				
-				while (center.y < wxGetApp().worldBox.min.y)
-					center.y += wxGetApp().worldBox.Height();
-				while (center.y > wxGetApp().worldBox.max.y)
-					center.y -= wxGetApp().worldBox.Height();
-
-				while (center.z < wxGetApp().worldBox.min.z)
-					center.z += wxGetApp().worldBox.Depth();
-				while (center.z > wxGetApp().worldBox.max.z)
-					center.z -= wxGetApp().worldBox.Depth();
-
-				physicalObject->SetCenter(center);
-			}
-		}
-	}
-
 	this->canvas->HandleKeypresses();
 	this->canvas->Refresh();
 

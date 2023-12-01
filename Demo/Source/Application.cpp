@@ -10,8 +10,6 @@ using namespace PhysicsEngine;
 Application::Application()
 {
 	this->frame = nullptr;
-	this->worldBox.min = Vector3(-10.0, -10.0, -10.0);
-	this->worldBox.max = Vector3(10.0, 10.0, 10.0);
 }
 
 /*virtual*/ Application::~Application()
