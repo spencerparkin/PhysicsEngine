@@ -10,5 +10,7 @@ public:
 
 	virtual void Render() const = 0;
 
+	void IssueColor() const;
+
 	PhysicsEngine::Vector3 color;
 };

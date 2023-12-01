@@ -14,7 +14,7 @@ int Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 Canvas::Canvas(wxWindow* parent) : wxGLCanvas(parent, wxID_ANY, attributeList)
 {
 	this->keyboardMode = KeyboardMode::FREE_CAM;
-	this->cameraEye = Vector3(0.0, 0.0, 10.0);
+	this->cameraEye = Vector3(30.0, 10.0, 30.0);
 	this->cameraSubject = Vector3(0.0, 0.0, 0.0);
 	this->lightPosition = Vector3(10.0, 20.0, 50.0);
 

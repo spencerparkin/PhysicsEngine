@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Frame.h"
 #include "Box.h"
+#include "Ground.h"
 #include <wx/msgdlg.h>
 
 wxIMPLEMENT_APP(Application);
@@ -22,16 +23,18 @@ Application::Application()
 		return false;
 
 	auto boxA = this->simulation.AddPhysicsObject<Box>("boxA");
-	if (!boxA->Setup(Vector3(3.0, 0.5, 0.5), Vector3(1.0, 3.0, 0.0)))
+	if (!boxA->Setup(Vector3(2.0, 2.0, 2.0), Vector3(0.0, 4.0, 0.0)))
 	{
 		wxMessageBox("Failed to setup box A!", "Error", wxOK | wxICON_ERROR, nullptr);
 	}
 
-	auto boxB = this->simulation.AddPhysicsObject<Box>("boxB");
+	/*auto boxB = this->simulation.AddPhysicsObject<Box>("boxB");
 	if (!boxB->Setup(Vector3(0.5, 3.0, 3.0), Vector3(0.0, -2.0, 0.0)))
 	{
 		wxMessageBox("Failed to setup box B!", "Error", wxOK | wxICON_ERROR, nullptr);
-	}
+	}*/
+
+	auto ground = this->simulation.AddPhysicsObject<Ground>("ground");
 
 	this->frame = new Frame(wxDefaultPosition, wxSize(1200, 800));
 	this->frame->Show(true);

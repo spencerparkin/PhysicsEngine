@@ -61,7 +61,7 @@ GroundPlane::GroundPlane()
 	Matrix3x3 orientationInv(orientation);
 	orientationInv.Transpose();
 	Matrix3x3 inertiaTensorInv = orientation * rigidBody->GetBodySpaceInertiaTensorInv() * orientationInv;
-	double coeficientOfRestitution = 1.0;
+	double coeficientOfRestitution = 0.5;
 	bool collisionOccurred = false;
 
 	do
@@ -87,7 +87,7 @@ GroundPlane::GroundPlane()
 				impulse *= mag;
 
 				rigidBody->SetLinearMomentum(rigidBody->GetLinearMomentum() + impulse);
-				rigidBody->SetAngularMomentum(rigidBody->GetAngularMomentum().CrossProduct(impulse));
+				rigidBody->SetAngularMomentum(rigidBody->GetAngularMomentum() + particleVec.CrossProduct(impulse));
 
 				collisionOccurred = true;
 			}

@@ -118,6 +118,10 @@ void Simulation::Tick()
 		else
 		{
 			// Do a binary search for the precise time of collision up to the configured tolerance.
+			// This search seems necessary for accurate contact point calculation, but it also seems
+			// like something that is potentially a big problem for resting contact where we need to
+			// resolve "collision" every single tick.  We can't afford this search every single tick.
+			// In fact, I probably have bugs where it's being forced to happen multiple times per tick.
 			double timeA = this->currentTime;
 			double timeB = this->currentTime + timeStep;
 			while (timeB - timeA > this->collisionTimeTolerance)

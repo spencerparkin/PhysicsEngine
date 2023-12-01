@@ -32,6 +32,32 @@ double Vector3::Length() const
 	return ::sqrt(this->InnerProduct(*this));
 }
 
+void Vector3::SetOrthogonalTo(const Vector3& vector)
+{
+	double ax = ::abs(vector.x);
+	double ay = ::abs(vector.y);
+	double az = ::abs(vector.z);
+
+	if (ax < ay && ax < az)
+	{
+		this->x = 0.0;
+		this->y = az;
+		this->z = -ay;
+	}
+	else if (ay < ax && ay < az)
+	{
+		this->x = az;
+		this->y = 0.0;
+		this->z = -ax;
+	}
+	else //if(az < ax && az < ax)
+	{
+		this->x = ay;
+		this->y = -ax;
+		this->z = 0.0;
+	}
+}
+
 double Vector3::InnerProduct(const Vector3& vector) const
 {
 	return this->x * vector.x + this->y * vector.y + this->z * vector.z;

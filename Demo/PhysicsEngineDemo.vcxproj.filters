@@ -22,6 +22,9 @@
     <ClInclude Include="Source\RenderObject.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Ground.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp">
@@ -37,6 +40,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Box.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ground.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

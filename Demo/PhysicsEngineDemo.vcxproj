@@ -23,6 +23,7 @@
     <ClInclude Include="Source\Box.h" />
     <ClInclude Include="Source\Canvas.h" />
     <ClInclude Include="Source\Frame.h" />
+    <ClInclude Include="Source\Ground.h" />
     <ClInclude Include="Source\RenderObject.h" />
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +31,7 @@
     <ClCompile Include="Source\Box.cpp" />
     <ClCompile Include="Source\Canvas.cpp" />
     <ClCompile Include="Source\Frame.cpp" />
+    <ClCompile Include="Source\Ground.cpp" />
     <ClCompile Include="Source\RenderObject.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
